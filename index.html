@@ -833,6 +833,26 @@ function showInvTab(tabId, btn) {
 }
 
 // ============================================================
+//  ORDER ID GENERATOR — LV"YYMMDD"-"XX"
+// ============================================================
+async function generateOrderId() {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(2);
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  const prefix = `LV${yy}${mm}${dd}`;
+  // Đếm số đơn đã tạo trong ngày hôm nay
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  const endOfDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1).toISOString();
+  const { count } = await db.from('revenues')
+    .select('order_id', { count:'exact', head:true })
+    .gte('created_at', startOfDay)
+    .lt('created_at', endOfDay);
+  const seq = String((count||0)+1).padStart(2,'0');
+  return `${prefix}-${seq}`;
+}
+
+// ============================================================
 //  CONNECTION CHECK
 // ============================================================
 async function checkConnection() {
@@ -1045,7 +1065,14 @@ async function confirmPayment(){
     }
     const price=posProduct.selling_price||0;
     const total=Math.max(0,price*qty-disc);
-    const {data:ord}=await db.from('revenues').insert({customer_phone:phone,sku:posProduct.sku,quantity:qty,selling_price:price,promotion_discount:disc,total_amount:total,order_status:status,notes:note}).select().single();
+    // Tạo mã đơn theo format LV"YYMMDD"-"XX"
+    const customOrderId = await generateOrderId();
+    const {data:ord}=await db.from('revenues').insert({
+      order_id: customOrderId,
+      customer_phone:phone, sku:posProduct.sku, quantity:qty,
+      selling_price:price, promotion_discount:disc,
+      total_amount:total, order_status:status, notes:note
+    }).select().single();
     await db.from('products').update({stock_quantity:(posProduct.stock_quantity||0)-qty}).eq('sku',posProduct.sku);
     if(status!=='Đã huỷ'&&status!=='Không thành công'){
       const newSpent=(posCustomer?.total_spent||0)+total;
@@ -1054,9 +1081,9 @@ async function confirmPayment(){
     // Update cache
     const pi=allProductsCache.findIndex(p=>p.sku===posProduct.sku);
     if(pi>=0) allProductsCache[pi].stock_quantity-=qty;
-    showToast(`✦ Thanh toán thành công! ${fmt(total)}`,'success');
+    showToast(`✦ Đơn ${customOrderId} thành công! ${fmt(total)}`,'success');
     // Show invoice
-    showInvoice(ord||{order_id:'—',created_at:new Date().toISOString()},posCustomer,posProduct,qty,disc,total,status,note);
+    showInvoice(ord||{order_id:customOrderId,created_at:new Date().toISOString()},posCustomer,posProduct,qty,disc,total,status,note);
     clearPOS();
   } catch(e){ showAlert('pos-alert','Lỗi: '+e.message,'error'); }
   finally{ btn.innerHTML='✦ Xác Nhận Thanh Toán'; btn.disabled=false; }
