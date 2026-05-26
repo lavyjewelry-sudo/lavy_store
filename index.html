@@ -12,7 +12,9 @@
 <style>
 :root{--cream:#F7F5F0;--cream-deep:#EDE9E1;--gold:#B89766;--gold-pale:#EDE0CC;--charcoal:#2D2D2D;--charcoal-soft:#4A4A4A;--pearl:#FFFFFF;--sage:#E2E8DD;--sage-dark:#C8D4C2;--stone:#D6D0C8;--stone-light:#EAE6DF;--error:#C0574B;--error-pale:#F9EDEB;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--charcoal);min-height:100vh;display:flex;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+/* Force Inter on ALL inputs — overrides browser default serif */
+input,input[type="text"],input[type="tel"],input[type="number"],input[type="email"],input[type="password"],input[type="date"],select,textarea,button{font-family:'Inter',sans-serif!important;}
 h1,h2,h3,h4{font-family:'Playfair Display',serif;}
 /* SIDEBAR */
 .sidebar{width:240px;min-width:240px;background:var(--pearl);border-right:1px solid var(--stone-light);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:2px 0 20px rgba(0,0,0,0.04);}
@@ -69,16 +71,37 @@ tr:hover td{background:var(--cream);}
 .badge-orange{background:#FEF3C7;color:#92400E;}
 /* FORM */
 .form-group{margin-bottom:16px;}
-label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:.12em;color:#9A9590;font-weight:600;margin-bottom:6px;}
-input,select,textarea{width:100%;padding:10px 13px;border:1px solid var(--stone);border-radius:10px;font-size:0.84rem;font-family:'Inter',sans-serif;font-weight:400;line-height:1.5;color:var(--charcoal);background:var(--pearl);transition:border-color .18s,box-shadow .18s;outline:none;-webkit-font-smoothing:antialiased;}
+label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.13em;color:#9A9590;font-weight:600;margin-bottom:6px;font-family:'Inter',sans-serif!important;}
+input,select,textarea{
+  width:100%;
+  padding:10px 13px;
+  border:1px solid var(--stone);
+  border-radius:10px;
+  font-size:0.84rem!important;
+  font-family:'Inter',sans-serif!important;
+  font-weight:400!important;
+  line-height:1.5;
+  color:var(--charcoal)!important;
+  background:var(--pearl);
+  transition:border-color .18s,box-shadow .18s;
+  outline:none;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
 input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,151,102,.1);}
-input::placeholder,textarea::placeholder{color:#C8C2BA;font-weight:300;font-size:0.81rem;}
-select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23B0A898' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+input::placeholder,textarea::placeholder{color:#C8C2BA!important;font-weight:300!important;font-size:0.81rem!important;font-family:'Inter',sans-serif!important;}
+select{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23B0A898' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+  cursor:pointer;
+}
+select option{font-family:'Inter',sans-serif!important;font-size:0.84rem!important;}
 textarea{resize:vertical;min-height:70px;}
 input[type=date]{color:var(--charcoal);}
 input[type=number]{-moz-appearance:textfield;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.13em;color:#9A9590;font-weight:600;margin-bottom:6px;font-family:'Inter',sans-serif;}
+input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor:default;}
 /* BUTTONS */
 .btn-primary{background:var(--gold);color:white;border:none;padding:11px 22px;border-radius:10px;font-size:0.83rem;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.03em;}
 .btn-primary:hover{background:#A8864F;transform:translateY(-1px);box-shadow:0 4px 16px rgba(184,151,102,.25);}
@@ -146,7 +169,8 @@ label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--stone);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 /* STATUS */
-.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:500;}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:500;white-space:nowrap;}
+.status-processing{background:#F3E8FF;color:#6B3FA0;}
 .status-pending{background:#FEF3C7;color:#92400E;}
 .status-shipping{background:#E0E8F5;color:#3A5A8A;}
 .status-done{background:var(--sage);color:#3D6137;}
@@ -304,6 +328,7 @@ label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1
           <div class="form-group">
             <label>Trạng Thái Đơn</label>
             <select id="pos-status">
+              <option value="Đang xử lý">⏳ Đang xử lý</option>
               <option value="Đang giao">🚚 Đang giao</option>
               <option value="Đã giao thành công">✅ Đã giao thành công</option>
               <option value="Đã huỷ">❌ Đã huỷ</option>
@@ -343,8 +368,9 @@ label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1
   <div class="page-header">
     <div class="page-header-left"><h2>Quản Lý Đơn Hàng</h2><p>Theo dõi và cập nhật trạng thái giao hàng</p></div>
     <div style="display:flex;gap:10px;align-items:center">
-      <select id="order-status-filter" onchange="loadOrders()" style="width:180px;padding:8px 12px;font-size:0.8rem">
+      <select id="order-status-filter" onchange="loadOrders()" style="width:185px;padding:8px 32px 8px 12px;font-size:0.83rem">
         <option value="">Tất cả trạng thái</option>
+        <option>Đang xử lý</option>
         <option>Đang giao</option>
         <option>Đã giao thành công</option>
         <option>Đã huỷ</option>
@@ -569,6 +595,7 @@ label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.1
     <div class="form-group">
       <label>Trạng Thái Mới</label>
       <select id="edit-order-status">
+        <option>Đang xử lý</option>
         <option>Đang giao</option>
         <option>Đã giao thành công</option>
         <option>Đã huỷ</option>
@@ -730,12 +757,13 @@ function closeModal(id){ document.getElementById(id).classList.remove('visible')
 
 function statusPill(s){
   const map = {
+    'Đang xử lý':'status-processing',
     'Đang giao':'status-shipping',
     'Đã giao thành công':'status-done',
     'Đã huỷ':'status-cancelled',
     'Không thành công':'status-failed',
   };
-  const icons = {'Đang giao':'🚚','Đã giao thành công':'✅','Đã huỷ':'❌','Không thành công':'⚠️'};
+  const icons = {'Đang xử lý':'⏳','Đang giao':'🚚','Đã giao thành công':'✅','Đã huỷ':'❌','Không thành công':'⚠️'};
   return `<span class="status-pill ${map[s]||'status-pending'}">${icons[s]||'◎'} ${s||'—'}</span>`;
 }
 function rankBadge(r){
@@ -1070,7 +1098,7 @@ function clearPOS(){
   ['pos-phone','pos-sku','new-cust-name','new-cust-address','pos-note'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('pos-qty').value=1;
   document.getElementById('pos-discount').value=0;
-  document.getElementById('pos-status').value='Đang giao';
+  document.getElementById('pos-status').value='Đang xử lý';
   document.getElementById('customer-found').classList.remove('visible');
   document.getElementById('customer-new').classList.remove('visible');
   document.getElementById('product-found').classList.remove('visible');
