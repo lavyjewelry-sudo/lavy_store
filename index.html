@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Atelier — CRM & POS</title>
+<title>Lavy Boutique — CRM & POS</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -18,7 +18,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',serif;}
 .sidebar{width:240px;min-width:240px;background:var(--pearl);border-right:1px solid var(--stone-light);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:2px 0 20px rgba(0,0,0,0.04);}
 .sidebar-logo{padding:24px 24px 20px;border-bottom:1px solid var(--stone-light);}
 .sidebar-logo h1{font-size:1.4rem;font-weight:600;color:var(--charcoal);letter-spacing:0.04em;}
-.sidebar-logo p{font-size:0.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.18em;margin-top:2px;font-weight:500;}
+.sidebar-logo p{font-size:0.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.22em;margin-top:2px;font-weight:700;}
 .role-badge{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:10px;font-size:0.65rem;font-weight:600;letter-spacing:0.08em;background:var(--gold-pale);color:var(--gold);}
 .nav-section{padding:14px 14px 4px;overflow-y:auto;flex:1;}
 .nav-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.2em;color:var(--stone);font-weight:600;padding:0 8px;margin-bottom:4px;margin-top:10px;}
@@ -70,9 +70,15 @@ tr:hover td{background:var(--cream);}
 /* FORM */
 .form-group{margin-bottom:16px;}
 label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:.12em;color:#9A9590;font-weight:600;margin-bottom:6px;}
-input,select,textarea{width:100%;padding:10px 13px;border:1px solid var(--stone);border-radius:10px;font-size:0.83rem;font-family:'Inter',sans-serif;color:var(--charcoal);background:var(--pearl);transition:all .2s;outline:none;}
+input,select,textarea{width:100%;padding:10px 13px;border:1px solid var(--stone);border-radius:10px;font-size:0.84rem;font-family:'Inter',sans-serif;font-weight:400;line-height:1.5;color:var(--charcoal);background:var(--pearl);transition:border-color .18s,box-shadow .18s;outline:none;-webkit-font-smoothing:antialiased;}
 input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,151,102,.1);}
-input::placeholder{color:#C0BAB2;}
+input::placeholder,textarea::placeholder{color:#C8C2BA;font-weight:300;font-size:0.81rem;}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23B0A898' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+textarea{resize:vertical;min-height:70px;}
+input[type=date]{color:var(--charcoal);}
+input[type=number]{-moz-appearance:textfield;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:.13em;color:#9A9590;font-weight:600;margin-bottom:6px;font-family:'Inter',sans-serif;}
 /* BUTTONS */
 .btn-primary{background:var(--gold);color:white;border:none;padding:11px 22px;border-radius:10px;font-size:0.83rem;font-family:'Inter',sans-serif;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.03em;}
 .btn-primary:hover{background:#A8864F;transform:translateY(-1px);box-shadow:0 4px 16px rgba(184,151,102,.25);}
@@ -165,8 +171,8 @@ input::placeholder{color:#C0BAB2;}
 <!-- =================== SIDEBAR =================== -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <h1>Atelier</h1>
-    <p>Management Suite</p>
+    <h1>Lavy Boutique</h1>
+    <p>Lavy Jewelry</p>
     <div id="sidebar-role-badge" class="role-badge">Admin</div>
   </div>
   <nav class="nav-section" id="main-nav">
@@ -1031,30 +1037,30 @@ async function confirmPayment(){
 function showInvoice(ord, cust, prod, qty, disc, total, status, note){
   const content=`
     <div style="text-align:center;margin-bottom:18px">
-      <h2 style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--charcoal)">Atelier</h2>
-      <p style="font-size:0.72rem;color:#9A9590;letter-spacing:.1em">MANAGEMENT SUITE</p>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--charcoal);letter-spacing:0.06em">Lavy Boutique</h2>
+      <p style="font-size:0.62rem;color:var(--gold);letter-spacing:0.22em;font-weight:600;text-transform:uppercase;margin-top:2px">Lavy Jewelry</p>
       <hr style="border:none;border-top:1px solid var(--stone-light);margin:12px 0"/>
     </div>
-    <div style="font-size:0.8rem;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:#9A9590">Mã đơn</span><span style="font-weight:500;font-size:0.72rem">${(ord.order_id||'').substring(0,8).toUpperCase()}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:#9A9590">Ngày</span><span>${fmtDate(ord.created_at)}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:#9A9590">Khách hàng</span><span style="font-weight:500">${cust?.customer_name||'—'}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:#9A9590">SĐT</span><span>${cust?.phone||'—'}</span></div>
+    <div style="font-size:0.8rem;line-height:1.85;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">Mã đơn</span><span style="font-weight:700;color:var(--gold);letter-spacing:0.06em">${ord.order_id||'—'}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">Ngày</span><span>${fmtDate(ord.created_at)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">Khách hàng</span><span style="font-weight:600">${cust?.customer_name||'—'}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">SĐT</span><span>${cust?.phone||'—'}</span></div>
     </div>
     <hr style="border:none;border-top:1px solid var(--stone-light);margin:12px 0"/>
-    <div style="font-size:0.82rem;margin-bottom:14px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>${prod?.product_name||'—'}</span><span>${fmt(prod?.selling_price)}</span></div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;color:#9A9590"><span>Số lượng × ${qty}</span><span>${fmt((prod?.selling_price||0)*qty)}</span></div>
-      ${disc>0?`<div style="display:flex;justify-content:space-between;margin-bottom:6px;color:var(--error)"><span>Giảm giá</span><span>-${fmt(disc)}</span></div>`:''}
+    <div style="font-size:0.82rem;line-height:1.85;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:500">${prod?.product_name||'—'}</span><span>${fmt(prod?.selling_price)}</span></div>
+      <div style="display:flex;justify-content:space-between;color:#9A9590"><span>Số lượng × ${qty}</span><span>${fmt((prod?.selling_price||0)*qty)}</span></div>
+      ${disc>0?`<div style="display:flex;justify-content:space-between;color:var(--error)"><span>Giảm giá</span><span>-${fmt(disc)}</span></div>`:''}
     </div>
     <hr style="border:none;border-top:2px solid var(--charcoal);margin:12px 0"/>
     <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;margin-bottom:12px">
       <span>THỰC THU</span><span style="color:var(--gold)">${fmt(total)}</span>
     </div>
     <div style="text-align:center;margin-bottom:8px">${statusPill(status)}</div>
-    ${note?`<p style="font-size:0.75rem;color:#9A9590;text-align:center;margin-top:8px">Ghi chú: ${note}</p>`:''}
+    ${note?`<p style="font-size:0.74rem;color:#9A9590;text-align:center;margin-top:8px;font-style:italic">Ghi chú: ${note}</p>`:''}
     <hr style="border:none;border-top:1px solid var(--stone-light);margin:14px 0"/>
-    <p style="text-align:center;font-size:0.72rem;color:#B0A898">Cảm ơn quý khách ✦</p>
+    <p style="text-align:center;font-size:0.71rem;color:#B0A898;letter-spacing:0.06em">Cảm ơn quý khách ✦ Lavy Boutique</p>
   `;
   document.getElementById('invoice-content').innerHTML=content;
   openModal('invoice-modal');
