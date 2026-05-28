@@ -171,11 +171,15 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 /* STATUS */
 .status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:500;white-space:nowrap;}
 .status-processing{background:#F3E8FF;color:#6B3FA0;}
+.status-blue{background:#E0E8F5;color:#3A5A8A;}
 .status-pending{background:#FEF3C7;color:#92400E;}
 .status-shipping{background:#E0E8F5;color:#3A5A8A;}
 .status-done{background:var(--sage);color:#3D6137;}
 .status-failed{background:var(--error-pale);color:var(--error);}
 .status-cancelled{background:var(--stone-light);color:#6A6560;}
+.status-deleted{background:#2D2D2D;color:#E0DDD8;}
+.status-returned{background:#E8F0FE;color:#1A56DB;}
+.status-waiting{background:#FFF8E1;color:#B8860B;}
 /* TABS */
 .tab-bar{display:flex;gap:0;border-bottom:2px solid var(--stone-light);margin-bottom:20px;}
 .tab-btn{padding:9px 20px;font-size:0.82rem;font-family:'Inter',sans-serif;border:none;background:transparent;cursor:pointer;color:#9A9590;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;font-weight:400;}
@@ -328,9 +332,13 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
           <div class="form-group">
             <label>Trạng Thái Đơn</label>
             <select id="pos-status">
+              <option value="Chờ xác nhận">⏰ Chờ xác nhận</option>
               <option value="Đang xử lý">⏳ Đang xử lý</option>
+              <option value="Đã xác nhận">✔ Đã xác nhận</option>
+              <option value="Đang đóng gói">📦 Đang đóng gói</option>
               <option value="Đang giao">🚚 Đang giao</option>
               <option value="Đã giao thành công">✅ Đã giao thành công</option>
+              <option value="Hoàn trả">↩ Hoàn trả</option>
               <option value="Đã huỷ">❌ Đã huỷ</option>
               <option value="Không thành công">⚠️ Không thành công</option>
             </select>
@@ -367,14 +375,19 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 <div id="screen-orders" class="screen">
   <div class="page-header">
     <div class="page-header-left"><h2>Quản Lý Đơn Hàng</h2><p>Theo dõi và cập nhật trạng thái giao hàng</p></div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <select id="order-status-filter" onchange="loadOrders()" style="width:185px;padding:8px 32px 8px 12px;font-size:0.83rem">
-        <option value="">Tất cả trạng thái</option>
-        <option>Đang xử lý</option>
-        <option>Đang giao</option>
-        <option>Đã giao thành công</option>
-        <option>Đã huỷ</option>
-        <option>Không thành công</option>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <select id="order-status-filter" onchange="loadOrders()" style="width:200px;padding:8px 32px 8px 12px;font-size:0.83rem">
+        <option value="">Tất cả (đang hoạt động)</option>
+        <option value="Chờ xác nhận">⏰ Chờ xác nhận</option>
+        <option value="Đang xử lý">⏳ Đang xử lý</option>
+        <option value="Đã xác nhận">✔ Đã xác nhận</option>
+        <option value="Đang đóng gói">📦 Đang đóng gói</option>
+        <option value="Đang giao">🚚 Đang giao</option>
+        <option value="Đã giao thành công">✅ Đã giao thành công</option>
+        <option value="Hoàn trả">↩ Hoàn trả</option>
+        <option value="Đã huỷ">❌ Đã huỷ</option>
+        <option value="Không thành công">⚠️ Không thành công</option>
+        <option value="__deleted__">🗑 Đơn đã xóa</option>
       </select>
       <button class="btn-ghost" onclick="loadOrders()" style="font-size:0.75rem;padding:8px 14px">↻ Làm mới</button>
     </div>
@@ -626,25 +639,44 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 
 <!-- Edit Order Status Modal -->
 <div class="modal-overlay" id="modal-editorder">
-  <div class="modal" style="max-width:380px">
+  <div class="modal" style="max-width:420px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
       <h3 class="modal-title" style="margin:0">Cập Nhật Đơn Hàng</h3>
       <button class="btn-icon" onclick="closeModal('modal-editorder')">✕</button>
     </div>
     <input type="hidden" id="edit-order-id"/>
+    <!-- Order info summary -->
+    <div id="edit-order-info" style="background:var(--cream);border:1px solid var(--stone-light);border-radius:10px;padding:12px;margin-bottom:16px;font-size:0.8rem;line-height:1.8">
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">Mã đơn</span><span id="edit-order-id-display" style="font-weight:700;color:var(--gold)">—</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">Khách hàng</span><span id="edit-order-customer-display" style="font-weight:500">—</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:#9A9590">Thực thu</span><span id="edit-order-amount-display" style="color:#5A7A52;font-weight:600">—</span></div>
+    </div>
     <div class="form-group">
       <label>Trạng Thái Mới</label>
       <select id="edit-order-status">
-        <option>Đang xử lý</option>
-        <option>Đang giao</option>
-        <option>Đã giao thành công</option>
-        <option>Đã huỷ</option>
-        <option>Không thành công</option>
+        <option value="Chờ xác nhận">⏰ Chờ xác nhận</option>
+        <option value="Đang xử lý">⏳ Đang xử lý</option>
+        <option value="Đã xác nhận">✔ Đã xác nhận</option>
+        <option value="Đang đóng gói">📦 Đang đóng gói</option>
+        <option value="Đang giao">🚚 Đang giao</option>
+        <option value="Đã giao thành công">✅ Đã giao thành công</option>
+        <option value="Hoàn trả">↩ Hoàn trả</option>
+        <option value="Đã huỷ">❌ Đã huỷ</option>
+        <option value="Không thành công">⚠️ Không thành công</option>
       </select>
+    </div>
+    <div class="form-group">
+      <label>Người Cập Nhật</label>
+      <input type="text" id="edit-order-updater" placeholder="Tên nhân viên cập nhật..."/>
     </div>
     <div class="form-group">
       <label>Ghi Chú</label>
       <textarea id="edit-order-note" rows="2" placeholder="Cập nhật thêm thông tin..."></textarea>
+    </div>
+    <!-- Last updated info -->
+    <div id="edit-order-last-update" style="display:none;background:var(--sage);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:0.75rem;color:#3D6137;line-height:1.7">
+      <div>🕐 Cập nhật lần cuối: <strong id="edit-order-last-time">—</strong></div>
+      <div>👤 Người chỉnh: <strong id="edit-order-last-user">—</strong></div>
     </div>
     <div style="display:flex;gap:10px">
       <button class="btn-primary" style="flex:1" onclick="saveOrderStatus()">Cập Nhật</button>
@@ -797,13 +829,22 @@ function closeModal(id){ document.getElementById(id).classList.remove('visible')
 
 function statusPill(s){
   const map = {
+    'Chờ xác nhận':'status-waiting',
     'Đang xử lý':'status-processing',
+    'Đã xác nhận':'status-blue',
+    'Đang đóng gói':'status-pending',
     'Đang giao':'status-shipping',
     'Đã giao thành công':'status-done',
+    'Hoàn trả':'status-returned',
     'Đã huỷ':'status-cancelled',
     'Không thành công':'status-failed',
+    'Đã xóa':'status-deleted',
   };
-  const icons = {'Đang xử lý':'⏳','Đang giao':'🚚','Đã giao thành công':'✅','Đã huỷ':'❌','Không thành công':'⚠️'};
+  const icons = {
+    'Chờ xác nhận':'⏰','Đang xử lý':'⏳','Đã xác nhận':'✔',
+    'Đang đóng gói':'📦','Đang giao':'🚚','Đã giao thành công':'✅',
+    'Hoàn trả':'↩','Đã huỷ':'❌','Không thành công':'⚠️','Đã xóa':'🗑',
+  };
   return `<span class="status-pill ${map[s]||'status-pending'}">${icons[s]||'◎'} ${s||'—'}</span>`;
 }
 function rankBadge(r){
@@ -935,7 +976,7 @@ function setDashFilter(f, btn) {
 async function loadDashboard() {
   const from = getDateRange(dashFilter);
   const [{data:revData},{data:expData}] = await Promise.all([
-    db.from('revenues').select('total_amount,order_id,order_status').gte('created_at',from),
+    db.from('revenues').select('total_amount,order_id,order_status').gte('created_at',from).is('deleted_at',null),
     db.from('expenses').select('total_amount,item_name').gte('created_at',from)
   ]);
   const totalRev = (revData||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công').reduce((s,r)=>s+(r.total_amount||0),0);
@@ -963,7 +1004,7 @@ async function loadDashboard() {
   </tbody></table>` : '<div class="empty-state"><div class="icon">◻</div><p>Không có chi phí</p></div>';
 
   // Revenue by type
-  const {data:revDetail} = await db.from('revenues').select('total_amount,quantity,products(type),order_status').gte('created_at',from);
+  const {data:revDetail} = await db.from('revenues').select('total_amount,quantity,products(type),order_status').gte('created_at',from).is('deleted_at',null);
   const typeMap = {};
   (revDetail||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công').forEach(r=>{
     const t=r.products?.type||'Khác';
@@ -1188,32 +1229,59 @@ function showAlert(id,msg,type='success'){
 // ============================================================
 async function loadOrders(){
   const statusFilter = document.getElementById('order-status-filter').value;
-  let q = db.from('revenues').select('order_id,created_at,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,customers(customer_name),products(product_name,type)').order('created_at',{ascending:false}).limit(200);
-  if(statusFilter) q=q.eq('order_status',statusFilter);
+  const isDeletedView = statusFilter === '__deleted__';
+  let q = db.from('revenues').select('order_id,created_at,updated_at,updated_by,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,deleted_at,customers(customer_name),products(product_name,type)').order('created_at',{ascending:false}).limit(200);
+  if(isDeletedView){
+    q = q.not('deleted_at','is',null);
+  } else {
+    q = q.is('deleted_at',null);
+    if(statusFilter) q=q.eq('order_status',statusFilter);
+  }
   const {data,error}=await q;
   const wrap=document.getElementById('orders-table-wrap');
-  if(error||!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◷</div><p>Không có đơn hàng</p></div>'; return; }
+  if(error||!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◷</div><p>'+(isDeletedView?'Không có đơn hàng đã xóa':'Không có đơn hàng')+'</p></div>'; return; }
   wrap.innerHTML=`<div style="overflow-x:auto"><table><thead><tr>
-    <th>Mã Đơn</th><th>Ngày</th><th>Khách Hàng</th><th>Sản Phẩm</th><th>SL</th><th style="text-align:right">Thực Thu</th><th>Trạng Thái</th><th>Ghi Chú</th><th></th>
+    <th>Mã Đơn</th><th>Ngày Tạo</th><th>Khách Hàng</th><th>Sản Phẩm</th><th>SL</th><th style="text-align:right">Thực Thu</th><th>Trạng Thái</th><th>Cập Nhật Cuối</th><th>Ghi Chú</th><th></th>
   </tr></thead><tbody>
-  ${data.map(r=>`<tr>
-    <td style="font-size:0.72rem;color:var(--gold);font-weight:600">${(r.order_id||'').substring(0,8).toUpperCase()}</td>
-    <td style="font-size:0.76rem;white-space:nowrap">${fmtDate(r.created_at)}</td>
-    <td style="font-weight:500">${r.customers?.customer_name||r.customer_phone||'—'}</td>
-    <td><span class="badge badge-stone" style="font-size:0.68rem">${r.products?.type||'—'}</span> ${r.products?.product_name||r.sku||'—'}</td>
-    <td>${r.quantity}</td>
-    <td style="text-align:right;font-weight:600;color:#5A7A52">${fmt(r.total_amount)}</td>
-    <td>${statusPill(r.order_status)}</td>
-    <td style="font-size:0.75rem;color:#9A9590;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.notes||'—'}</td>
-    <td><button class="btn-icon" onclick="openEditOrder('${r.order_id}','${r.order_status||''}','${(r.notes||'').replace(/'/g,"&apos;")}')" title="Cập nhật">✎</button></td>
-  </tr>`).join('')}
+  ${data.map(r=>{
+    const lastUpdate = r.updated_at ? `<div style="font-size:0.72rem;color:#9A9590;white-space:nowrap">${fmtDate(r.updated_at)}</div>${r.updated_by?`<div style="font-size:0.7rem;color:var(--gold)">👤 ${r.updated_by}</div>`:''}` : '<span style="color:#C8C2BA;font-size:0.72rem">—</span>';
+    const actionBtns = isDeletedView
+      ? `<button class="btn-icon" onclick="restoreOrder('${r.order_id}')" title="Khôi phục" style="color:#5A7A52">↩</button>`
+      : `<button class="btn-icon" onclick="openEditOrder('${r.order_id}','${r.order_status||''}','${(r.notes||'').replace(/'/g,"&apos;")}','${r.customers?.customer_name||r.customer_phone||''}','${fmt(r.total_amount).replace(/'/g,'')}','${r.updated_at||''}','${r.updated_by||''}')" title="Cập nhật">✎</button>
+         <button class="btn-icon" onclick="deleteOrder('${r.order_id}')" title="Xóa đơn" style="color:var(--error)">🗑</button>`;
+    return `<tr ${isDeletedView?'style="opacity:0.65"':''}>
+      <td style="font-size:0.72rem;color:var(--gold);font-weight:600">${(r.order_id||'').toUpperCase()}</td>
+      <td style="font-size:0.76rem;white-space:nowrap">${fmtDate(r.created_at)}</td>
+      <td style="font-weight:500">${r.customers?.customer_name||r.customer_phone||'—'}</td>
+      <td><span class="badge badge-stone" style="font-size:0.68rem">${r.products?.type||'—'}</span> ${r.products?.product_name||r.sku||'—'}</td>
+      <td>${r.quantity}</td>
+      <td style="text-align:right;font-weight:600;color:#5A7A52">${fmt(r.total_amount)}</td>
+      <td>${isDeletedView?statusPill('Đã xóa'):statusPill(r.order_status)}</td>
+      <td>${lastUpdate}</td>
+      <td style="font-size:0.75rem;color:#9A9590;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.notes||'—'}</td>
+      <td style="white-space:nowrap">${actionBtns}</td>
+    </tr>`;
+  }).join('')}
   </tbody></table></div>`;
 }
 
-function openEditOrder(id, status, note){
+function openEditOrder(id, status, note, customerName, amount, updatedAt, updatedBy){
   document.getElementById('edit-order-id').value=id;
+  document.getElementById('edit-order-id-display').textContent=id.toUpperCase();
+  document.getElementById('edit-order-customer-display').textContent=customerName||'—';
+  document.getElementById('edit-order-amount-display').textContent=amount||'—';
   document.getElementById('edit-order-status').value=status;
   document.getElementById('edit-order-note').value=note;
+  document.getElementById('edit-order-updater').value='';
+  // Show last update info
+  const lastBlock = document.getElementById('edit-order-last-update');
+  if(updatedAt && updatedAt!=='undefined' && updatedAt!==''){
+    lastBlock.style.display='block';
+    document.getElementById('edit-order-last-time').textContent=fmtDate(updatedAt);
+    document.getElementById('edit-order-last-user').textContent=(updatedBy&&updatedBy!=='undefined'&&updatedBy!=='')?updatedBy:'Không rõ';
+  } else {
+    lastBlock.style.display='none';
+  }
   openModal('modal-editorder');
 }
 
@@ -1221,9 +1289,32 @@ async function saveOrderStatus(){
   const id=document.getElementById('edit-order-id').value;
   const status=document.getElementById('edit-order-status').value;
   const note=document.getElementById('edit-order-note').value;
-  await db.from('revenues').update({order_status:status,notes:note}).eq('order_id',id);
+  const updater=document.getElementById('edit-order-updater').value.trim();
+  const now=new Date().toISOString();
+  const updates={order_status:status,notes:note,updated_at:now};
+  if(updater) updates.updated_by=updater;
+  const {error}=await db.from('revenues').update(updates).eq('order_id',id);
+  if(error) return showToast('Lỗi: '+error.message,'error');
   closeModal('modal-editorder');
   showToast('✦ Cập nhật trạng thái thành công','success');
+  loadOrders();
+}
+
+async function deleteOrder(id){
+  if(!confirm(`Xóa đơn hàng ${id.toUpperCase()}?\n\nĐơn sẽ được chuyển vào thùng rác, có thể khôi phục sau.`)) return;
+  const now=new Date().toISOString();
+  const {error}=await db.from('revenues').update({deleted_at:now,updated_at:now}).eq('order_id',id);
+  if(error) return showToast('Lỗi: '+error.message,'error');
+  showToast('🗑 Đã xóa đơn hàng','success');
+  loadOrders();
+}
+
+async function restoreOrder(id){
+  if(!confirm(`Khôi phục đơn hàng ${id.toUpperCase()}?`)) return;
+  const now=new Date().toISOString();
+  const {error}=await db.from('revenues').update({deleted_at:null,updated_at:now}).eq('order_id',id);
+  if(error) return showToast('Lỗi: '+error.message,'error');
+  showToast('✦ Đã khôi phục đơn hàng','success');
   loadOrders();
 }
 
