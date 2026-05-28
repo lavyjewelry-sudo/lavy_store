@@ -412,7 +412,7 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 
   <!-- Tab: Nhập/Chi phí (Admin only) -->
   <div id="tab-expense" class="tab-panel admin-only">
-    <div class="card">
+    <div class="card" style="margin-bottom:18px">
       <div class="card-title">Ghi Nhận Chi Phí / Nhập Hàng</div>
       <div class="three-col">
         <div class="form-group">
@@ -441,11 +441,28 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
       </div>
       <button class="btn-primary" onclick="saveExpense()">+ Ghi Nhận</button>
     </div>
+    <!-- Lịch sử chi phí inline dưới form -->
+    <div class="card">
+      <div class="card-title">
+        Lịch Sử Vừa Ghi Nhận
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:400;color:#9A9590">
+            <label style="text-transform:none;letter-spacing:0;margin:0;font-size:0.76rem">Từ</label>
+            <input type="date" id="exp-filter-from" style="width:140px;padding:5px 9px;font-size:0.76rem" onchange="loadExpenseInline()"/>
+            <label style="text-transform:none;letter-spacing:0;margin:0;font-size:0.76rem">Đến</label>
+            <input type="date" id="exp-filter-to" style="width:140px;padding:5px 9px;font-size:0.76rem" onchange="loadExpenseInline()"/>
+          </div>
+          <button class="btn-ghost" onclick="clearExpFilter()" style="font-size:0.72rem;padding:5px 10px">Xoá lọc</button>
+          <button class="btn-ghost" onclick="loadExpenseInline()" style="font-size:0.73rem;padding:6px 12px">↻</button>
+        </div>
+      </div>
+      <div id="exp-inline-table-wrap"><div class="empty-state"><div class="icon">◻</div><p>Đang tải...</p></div></div>
+    </div>
   </div>
 
   <!-- Tab: Thêm sản phẩm (Admin only) -->
   <div id="tab-addprod" class="tab-panel admin-only">
-    <div class="card">
+    <div class="card" style="margin-bottom:18px">
       <div class="card-title">Thêm Sản Phẩm Mới</div>
       <div class="three-col">
         <div class="form-group"><label>SKU *</label><input type="text" id="prd-sku" placeholder="VX001"/></div>
@@ -461,12 +478,35 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
       </div>
       <button class="btn-secondary" onclick="saveProduct()">Thêm Sản Phẩm</button>
     </div>
+    <!-- Danh sách sản phẩm đã thêm -->
+    <div class="card">
+      <div class="card-title">
+        Danh Sách Sản Phẩm Đã Thêm
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="text" id="addprod-search" placeholder="Tìm SKU, tên..." style="width:180px;padding:5px 10px;font-size:0.77rem" oninput="filterAddprodList()"/>
+          <button class="btn-ghost" onclick="loadAddprodList()" style="font-size:0.73rem;padding:6px 12px">↻</button>
+        </div>
+      </div>
+      <div id="addprod-table-wrap"><div class="empty-state"><div class="icon">◻</div><p>Đang tải...</p></div></div>
+    </div>
   </div>
 
   <!-- Tab: Lịch sử chi phí (Admin only) -->
   <div id="tab-explog" class="tab-panel admin-only">
     <div class="card">
-      <div class="card-title">Lịch Sử Nhập Hàng & Chi Phí<button class="btn-ghost" onclick="loadExpenseLog()" style="font-size:0.73rem;padding:6px 12px">↻</button></div>
+      <div class="card-title">
+        Lịch Sử Nhập Hàng & Chi Phí
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:400;color:#9A9590">
+            <label style="text-transform:none;letter-spacing:0;margin:0;font-size:0.76rem">Từ</label>
+            <input type="date" id="explog-filter-from" style="width:140px;padding:5px 9px;font-size:0.76rem" onchange="loadExpenseLog()"/>
+            <label style="text-transform:none;letter-spacing:0;margin:0;font-size:0.76rem">Đến</label>
+            <input type="date" id="explog-filter-to" style="width:140px;padding:5px 9px;font-size:0.76rem" onchange="loadExpenseLog()"/>
+          </div>
+          <button class="btn-ghost" onclick="clearExplogFilter()" style="font-size:0.72rem;padding:5px 10px">Xoá lọc</button>
+          <button class="btn-ghost" onclick="loadExpenseLog()" style="font-size:0.73rem;padding:6px 12px">↻</button>
+        </div>
+      </div>
       <div id="explog-table-wrap"><div class="empty-state"><div class="icon">◻</div><p>Đang tải...</p></div></div>
     </div>
   </div>
@@ -817,7 +857,7 @@ function showScreen(name, el) {
   document.getElementById('screen-'+name).classList.add('active');
   currentScreen = name;
   if(name==='dashboard') loadDashboard();
-  if(name==='inventory') { loadProducts(); if(isAdmin()) loadExpenseLog(); }
+  if(name==='inventory') { loadProducts(); if(isAdmin()) { loadExpenseLog(); loadExpenseInline(); loadAddprodList(); } }
   if(name==='customers') loadCustomers();
   if(name==='orders') loadOrders();
   if(name==='hr') loadStaff();
@@ -830,6 +870,8 @@ function showInvTab(tabId, btn) {
   document.getElementById(tabId).classList.add('active');
   btn.classList.add('active');
   if(tabId==='tab-explog') loadExpenseLog();
+  if(tabId==='tab-expense') loadExpenseInline();
+  if(tabId==='tab-addprod') loadAddprodList();
 }
 
 // ============================================================
@@ -1276,13 +1318,13 @@ async function saveExpense(){
   ['exp-name','exp-sku','exp-amount','exp-details'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('exp-qty').value=1;
   showToast('✦ Ghi nhận chi phí thành công','success');
-  loadProducts(); loadExpenseLog();
+  loadProducts(); loadExpenseLog(); loadExpenseInline();
 }
 
-async function loadExpenseLog(){
-  const {data}=await db.from('expenses').select('*').order('created_at',{ascending:false}).limit(100);
-  const wrap=document.getElementById('explog-table-wrap');
+function renderExpenseTable(data, wrapId){
+  const wrap=document.getElementById(wrapId);
   if(!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◻</div><p>Chưa có chi phí nào</p></div>'; return; }
+  const total=data.reduce((s,e)=>s+(e.total_amount||0),0);
   wrap.innerHTML=`<div style="overflow-x:auto"><table><thead><tr>
     <th>Ngày</th><th>Khoản Mục</th><th>SKU</th><th>Số Lượng</th><th style="text-align:right">Số Tiền</th><th>Ghi Chú</th>
   </tr></thead><tbody>
@@ -1294,6 +1336,70 @@ async function loadExpenseLog(){
     <td style="text-align:right;color:var(--error);font-weight:500">${fmt(e.total_amount)}</td>
     <td style="font-size:0.75rem;color:#9A9590">${e.details||'—'}</td>
   </tr>`).join('')}
+  <tr><td colspan="4" style="font-weight:600;color:var(--charcoal);font-size:0.82rem">Tổng ${data.length} khoản</td><td style="text-align:right;font-weight:700;color:var(--error)">${fmt(total)}</td><td></td></tr>
+  </tbody></table></div>`;
+}
+
+async function loadExpenseLog(){
+  const from=document.getElementById('explog-filter-from')?.value;
+  const to=document.getElementById('explog-filter-to')?.value;
+  let q=db.from('expenses').select('*').order('created_at',{ascending:false}).limit(500);
+  if(from) q=q.gte('created_at',from+'T00:00:00');
+  if(to) q=q.lte('created_at',to+'T23:59:59');
+  const {data}=await q;
+  renderExpenseTable(data,'explog-table-wrap');
+}
+
+async function loadExpenseInline(){
+  const from=document.getElementById('exp-filter-from')?.value;
+  const to=document.getElementById('exp-filter-to')?.value;
+  let q=db.from('expenses').select('*').order('created_at',{ascending:false}).limit(200);
+  if(from) q=q.gte('created_at',from+'T00:00:00');
+  if(to) q=q.lte('created_at',to+'T23:59:59');
+  const {data}=await q;
+  renderExpenseTable(data,'exp-inline-table-wrap');
+}
+
+function clearExpFilter(){
+  document.getElementById('exp-filter-from').value='';
+  document.getElementById('exp-filter-to').value='';
+  loadExpenseInline();
+}
+
+function clearExplogFilter(){
+  document.getElementById('explog-filter-from').value='';
+  document.getElementById('explog-filter-to').value='';
+  loadExpenseLog();
+}
+
+let allAddprodCache=[];
+async function loadAddprodList(){
+  const {data}=await db.from('products').select('*').order('created_at',{ascending:false}).limit(200);
+  allAddprodCache=data||[];
+  filterAddprodList();
+}
+
+function filterAddprodList(){
+  const q=(document.getElementById('addprod-search')?.value||'').toLowerCase();
+  const list=q?allAddprodCache.filter(p=>p.sku.toLowerCase().includes(q)||(p.product_name||'').toLowerCase().includes(q)):allAddprodCache;
+  const wrap=document.getElementById('addprod-table-wrap');
+  if(!list.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◻</div><p>Chưa có sản phẩm</p></div>'; return; }
+  wrap.innerHTML=`<div style="overflow-x:auto"><table><thead><tr>
+    <th>SKU</th><th>Tên Sản Phẩm</th><th>Loại</th><th>Giá Vốn</th><th>Giá Bán</th><th>Tồn Kho</th><th></th>
+  </tr></thead><tbody>
+  ${list.map(p=>{
+    const stock=p.stock_quantity||0;
+    const cls=stock>5?'stock-ok':stock>0?'stock-low':'stock-out';
+    return `<tr>
+      <td style="font-weight:600;color:var(--gold);font-size:0.78rem">${p.sku}</td>
+      <td style="font-weight:500;color:var(--charcoal)">${p.product_name}</td>
+      <td><span class="badge badge-stone">${p.type||'—'}</span></td>
+      <td>${fmt(p.original_price)}</td>
+      <td style="color:#5A7A52;font-weight:500">${fmt(p.selling_price)}</td>
+      <td><span class="stock-badge ${cls}">${fmtNum(stock)}</span></td>
+      <td><button class="btn-icon" onclick="openEditProduct('${p.sku}')" title="Chỉnh sửa">✎</button></td>
+    </tr>`;
+  }).join('')}
   </tbody></table></div>`;
 }
 
@@ -1325,7 +1431,7 @@ async function saveProduct(){
   ['prd-sku','prd-name','prd-cost','prd-sell'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('prd-stock').value=0;
   showToast('✦ Thêm sản phẩm thành công','success');
-  loadProducts();
+  loadProducts(); loadAddprodList();
 }
 
 // ============================================================
