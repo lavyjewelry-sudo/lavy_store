@@ -162,9 +162,14 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 .autocomplete-item .ac-sub{font-size:0.72rem;color:#9A9590;}
 /* INVOICE */
 @media print{
+  @page { margin: 10mm; }
   .sidebar,.page-header,.pos-grid>div:first-child,.btn-primary,.btn-ghost,.btn-secondary,.filter-bar,.nav-section,.no-print{display:none!important;}
   .main-content{margin:0;padding:0;max-width:100%;}
-  #invoice-modal .modal{box-shadow:none;max-width:100%;border-radius:0;}
+  .modal-overlay{position:static!important;background:none!important;display:block!important;}
+  #invoice-modal .modal{box-shadow:none!important;max-width:100%!important;border-radius:0!important;padding:0!important;}
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+  body > *:not(#invoice-modal) { display: none !important; }
+  #invoice-modal { display: block !important; }
 }
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--stone);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
