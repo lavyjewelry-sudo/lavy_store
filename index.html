@@ -1395,24 +1395,41 @@ async function loadOrders(){
   }
   const {data,error}=await q;
   const wrap=document.getElementById('orders-table-wrap');
-  if(error||!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◷</div><p>'+(isDeletedView?'Không có đơn hàng đã xóa':'Không có đơn hàng')+'</p></div>'; return; }
+  if(error){
+    console.error('loadOrders error:', error);
+    // Nếu cột is_deleted chưa tồn tại, fallback query không filter
+    if(error.message && (error.message.includes('is_deleted') || error.code==='42703')){
+      const {data:fallback, error:e2} = await db.from('revenues')
+        .select('order_id,created_at,updated_at,updated_by,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,customers(customer_name),products(product_name,type)')
+        .order('created_at',{ascending:false}).limit(200);
+      if(e2||!fallback||!fallback.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◷</div><p>Không có đơn hàng (cần chạy migration thêm cột is_deleted)</p></div>'; return; }
+      renderOrdersTable(fallback, false, wrap); return;
+    }
+    wrap.innerHTML=`<div class="empty-state"><div class="icon">⚠</div><p style="color:var(--error)">Lỗi: ${error.message}</p></div>`; return;
+  }
+  if(!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◷</div><p>'+(isDeletedView?'Không có đơn hàng đã xóa':'Chưa có đơn hàng nào')+'</p></div>'; return; }
+  renderOrdersTable(data, isDeletedView, wrap);
+}
+
+function renderOrdersTable(data, isDeletedView, wrap){
   wrap.innerHTML=`<div style="overflow-x:auto"><table><thead><tr>
     <th>Mã Đơn</th><th>Ngày Tạo</th><th>Khách Hàng</th><th>Sản Phẩm</th><th>SL</th><th style="text-align:right">Thực Thu</th><th>Trạng Thái</th><th>Cập Nhật Cuối</th><th>Ghi Chú</th><th></th>
   </tr></thead><tbody>
   ${data.map(r=>{
     const lastUpdate = r.updated_at ? `<div style="font-size:0.72rem;color:#9A9590;white-space:nowrap">${fmtDate(r.updated_at)}</div>${r.updated_by?`<div style="font-size:0.7rem;color:var(--gold)">👤 ${r.updated_by}</div>`:''}` : '<span style="color:#C8C2BA;font-size:0.72rem">—</span>';
-    const actionBtns = isDeletedView
+    const deleted = isDeletedView || r.is_deleted;
+    const actionBtns = deleted
       ? `<button class="btn-icon" onclick="restoreOrder('${r.order_id}')" title="Khôi phục" style="color:#5A7A52">↩</button>`
       : `<button class="btn-icon" onclick="openEditOrder('${r.order_id}','${r.order_status||''}','${(r.notes||'').replace(/'/g,"&apos;")}','${r.customers?.customer_name||r.customer_phone||''}','${fmt(r.total_amount).replace(/'/g,'')}','${r.updated_at||''}','${r.updated_by||''}')" title="Cập nhật">✎</button>
          <button class="btn-icon" onclick="deleteOrder('${r.order_id}')" title="Xóa đơn" style="color:var(--error)">🗑</button>`;
-    return `<tr ${isDeletedView?'style="opacity:0.65"':''}>
+    return `<tr ${deleted?'style="opacity:0.65"':''}>
       <td style="font-size:0.72rem;color:var(--gold);font-weight:600">${(r.order_id||'').toUpperCase()}</td>
       <td style="font-size:0.76rem;white-space:nowrap">${fmtDate(r.created_at)}</td>
       <td style="font-weight:500">${r.customers?.customer_name||r.customer_phone||'—'}</td>
       <td><span class="badge badge-stone" style="font-size:0.68rem">${r.products?.type||'—'}</span> ${r.products?.product_name||r.sku||'—'}</td>
       <td>${r.quantity}</td>
       <td style="text-align:right;font-weight:600;color:#5A7A52">${fmt(r.total_amount)}</td>
-      <td>${isDeletedView?statusPill('Đã xóa'):statusPill(r.order_status)}</td>
+      <td>${deleted?statusPill('Đã xóa'):statusPill(r.order_status)}</td>
       <td>${lastUpdate}</td>
       <td style="font-size:0.75rem;color:#9A9590;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.notes||'—'}</td>
       <td style="white-space:nowrap">${actionBtns}</td>
