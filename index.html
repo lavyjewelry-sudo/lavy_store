@@ -1453,7 +1453,9 @@ function renderOrdersTable(data, isDeletedView, wrap){
            <button class="btn-icon" onclick="deleteOrder('${r.order_id}')" title="Xóa đơn" style="color:var(--error);font-size:0.95rem">🗑</button>
          </div>`;
     return `<tr style="${deleted?'opacity:0.55;background:var(--cream)':''}">
-      <td style="white-space:nowrap"><span style="font-size:0.75rem;color:var(--gold);font-weight:700;letter-spacing:0.03em">${(r.order_id||'').toUpperCase()}</span></td>
+      <td style="max-width:120px">
+        <span style="font-size:0.74rem;color:var(--gold);font-weight:700;letter-spacing:0.02em;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.order_id||'').toUpperCase()}">${(r.order_id||'').toUpperCase()}</span>
+      </td>
       <td style="font-size:0.75rem;color:#6A6560;white-space:nowrap">${fmtDate(r.created_at)}</td>
       <td style="font-weight:500;font-size:0.82rem">${r.customers?.customer_name||r.customer_phone||'—'}</td>
       <td>
