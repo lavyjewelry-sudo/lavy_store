@@ -1386,7 +1386,7 @@ function showAlert(id,msg,type='success'){
 async function loadOrders(){
   const statusFilter = document.getElementById('order-status-filter').value;
   const isDeletedView = statusFilter === '__deleted__';
-  let q = db.from('revenues').select('order_id,created_at,updated_at,updated_by,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,is_deleted,customers(customer_name),products(product_name,type)').order('created_at',{ascending:false}).limit(200);
+  let q = db.from('revenues').select('order_id,created_at,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,customers(customer_name),products(product_name,type)').order('created_at',{ascending:false}).limit(200);
   if(isDeletedView){
     q = q.eq('is_deleted',true);
   } else {
@@ -1400,7 +1400,7 @@ async function loadOrders(){
     // Nếu cột is_deleted chưa tồn tại, fallback query không filter
     if(error.message && (error.message.includes('is_deleted') || error.code==='42703')){
       const {data:fallback, error:e2} = await db.from('revenues')
-        .select('order_id,created_at,updated_at,updated_by,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,customers(customer_name),products(product_name,type)')
+        .select('order_id,created_at,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,customers(customer_name),products(product_name,type)')
         .order('created_at',{ascending:false}).limit(200);
       if(e2||!fallback||!fallback.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◷</div><p>Không có đơn hàng (cần chạy migration thêm cột is_deleted)</p></div>'; return; }
       renderOrdersTable(fallback, false, wrap); return;
