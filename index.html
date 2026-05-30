@@ -255,19 +255,32 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
       <h2>Báo Cáo Kinh Doanh</h2>
       <p>Tổng quan doanh thu, chi phí và lợi nhuận</p>
     </div>
-    <div class="filter-bar" style="margin:0">
-      <button class="filter-btn active" onclick="setDashFilter('day',this)">Hôm nay</button>
-      <button class="filter-btn" onclick="setDashFilter('week',this)">Tuần</button>
-      <button class="filter-btn" onclick="setDashFilter('month',this)">Tháng</button>
-      <button class="filter-btn" onclick="setDashFilter('quarter',this)">Quý</button>
-      <button class="filter-btn" onclick="setDashFilter('year',this)">Năm</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.78rem;color:#9A9590">
+        <span>Từ</span>
+        <input type="date" id="dash-from" style="padding:6px 10px;font-size:0.78rem;border:1px solid var(--stone-light);border-radius:8px;background:var(--pearl)" onchange="loadDashboard()"/>
+        <span>Đến</span>
+        <input type="date" id="dash-to" style="padding:6px 10px;font-size:0.78rem;border:1px solid var(--stone-light);border-radius:8px;background:var(--pearl)" onchange="loadDashboard()"/>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button class="filter-btn active" onclick="setDashPreset('day',this)">Hôm nay</button>
+        <button class="filter-btn" onclick="setDashPreset('week',this)">Tuần</button>
+        <button class="filter-btn" onclick="setDashPreset('month',this)">Tháng</button>
+        <button class="filter-btn" onclick="setDashPreset('quarter',this)">Quý</button>
+        <button class="filter-btn" onclick="setDashPreset('year',this)">Năm</button>
+        <button class="filter-btn" onclick="setDashPreset('all',this)">Tất cả</button>
+      </div>
     </div>
   </div>
   <div class="kpi-grid">
-    <div class="kpi-card gold"><div class="kpi-label">Tổng Doanh Thu</div><div class="kpi-value sage-text" id="kpi-revenue">—</div><div class="kpi-sub" id="kpi-revenue-sub">...</div></div>
-    <div class="kpi-card rose"><div class="kpi-label">Tổng Chi Phí</div><div class="kpi-value rose-text" id="kpi-expenses">—</div><div class="kpi-sub" id="kpi-expenses-sub">...</div></div>
-    <div class="kpi-card sage"><div class="kpi-label">Lợi Nhuận Gộp</div><div class="kpi-value" id="kpi-profit">—</div><div class="kpi-sub" id="kpi-profit-sub">...</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Số Đơn Hàng</div><div class="kpi-value" id="kpi-orders">—</div><div class="kpi-sub" id="kpi-orders-sub">...</div></div>
+    <div class="kpi-card gold" style="cursor:pointer" onclick="setDashPreset('month',null)" title="Lọc theo tháng này">
+      <div class="kpi-label">Tổng Doanh Thu</div><div class="kpi-value sage-text" id="kpi-revenue">—</div><div class="kpi-sub" id="kpi-revenue-sub">...</div></div>
+    <div class="kpi-card rose" style="cursor:pointer" onclick="setDashPreset('month',null)" title="Lọc theo tháng này">
+      <div class="kpi-label">Tổng Chi Phí</div><div class="kpi-value rose-text" id="kpi-expenses">—</div><div class="kpi-sub" id="kpi-expenses-sub">...</div></div>
+    <div class="kpi-card sage" style="cursor:pointer" onclick="setDashPreset('month',null)" title="Lọc theo tháng này">
+      <div class="kpi-label">Lợi Nhuận Gộp</div><div class="kpi-value" id="kpi-profit">—</div><div class="kpi-sub" id="kpi-profit-sub">...</div></div>
+    <div class="kpi-card blue" style="cursor:pointer" onclick="showScreen('orders')" title="Xem đơn hàng">
+      <div class="kpi-label">Số Đơn Hàng</div><div class="kpi-value" id="kpi-orders">—</div><div class="kpi-sub" id="kpi-orders-sub">...</div></div>
   </div>
   <div class="grid-2-3" style="gap:18px">
     <div class="card"><div class="card-title">Chi Phí Theo Mặt Hàng</div><div id="expenses-table-wrap"><div class="empty-state"><div class="icon">◻</div><p>Đang tải...</p></div></div></div>
@@ -534,7 +547,10 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 <div id="screen-customers" class="screen">
   <div class="page-header">
     <div class="page-header-left"><h2>Danh Sách Khách Hàng</h2><p>CRM — Theo dõi hành vi mua sắm và chăm sóc khách hàng</p></div>
-    <input type="text" id="crm-search" placeholder="Tìm tên, SĐT..." style="width:220px;padding:8px 12px;font-size:0.8rem" oninput="filterCustomers()"/>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input type="text" id="crm-search" placeholder="Tìm tên, SĐT..." style="width:200px;padding:8px 12px;font-size:0.8rem" oninput="filterCustomers()"/>
+      <button class="btn-primary" onclick="openModal('modal-addcustomer')">+ Thêm Khách Hàng</button>
+    </div>
   </div>
   <div id="crm-detail" style="display:none;margin-bottom:18px"></div>
   <div class="card">
@@ -638,6 +654,34 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
     <div style="display:flex;gap:10px;margin-top:8px">
       <button class="btn-primary" style="flex:1" onclick="saveEditProduct()">Lưu Thay Đổi</button>
       <button class="btn-ghost" style="flex:1" onclick="closeModal('modal-editprod')">Huỷ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-overlay" id="modal-addcustomer">
+  <div class="modal" style="max-width:440px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 class="modal-title" style="margin:0">Thêm Khách Hàng</h3>
+      <button class="btn-icon" onclick="closeModal('modal-addcustomer')">✕</button>
+    </div>
+    <div id="addcust-alert" class="alert"></div>
+    <div class="two-col">
+      <div class="form-group"><label>SĐT *</label><input type="text" id="addcust-phone" placeholder="0912 345 678"/></div>
+      <div class="form-group"><label>Họ Tên *</label><input type="text" id="addcust-name" placeholder="Nguyễn Thị Mai"/></div>
+    </div>
+    <div class="form-group"><label>Địa Chỉ</label><input type="text" id="addcust-address" placeholder="123 Nguyễn Huệ, Q1..."/></div>
+    <div class="form-group"><label>Phân Hạng</label>
+      <select id="addcust-rank">
+        <option value="Thân thiết">Thân thiết</option>
+        <option value="Bạc">Bạc</option>
+        <option value="Vàng">Vàng</option>
+        <option value="VIP">VIP</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn-primary" style="flex:1" onclick="saveNewCustomer()">Thêm Khách Hàng</button>
+      <button class="btn-ghost" style="flex:1" onclick="closeModal('modal-addcustomer')">Huỷ</button>
     </div>
   </div>
 </div>
@@ -989,7 +1033,15 @@ function showScreen(name, el) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
   currentScreen = name;
-  if(name==='dashboard') loadDashboard();
+  if(name==='dashboard'){
+    if(!document.getElementById('dash-from')?.value){
+      // set default to today
+      const today = new Date().toLocaleDateString('en-CA');
+      document.getElementById('dash-from').value = today;
+      document.getElementById('dash-to').value = today;
+    }
+    loadDashboard();
+  }
   if(name==='inventory') { loadProducts(); if(isAdmin()) { loadExpenseLog(); loadExpenseInline(); loadAddprodList(); } }
   if(name==='customers') loadCustomers();
   if(name==='orders') loadOrders();
@@ -1045,31 +1097,35 @@ async function checkConnection() {
 // ============================================================
 //  DASHBOARD
 // ============================================================
-let dashFilter = 'day';
+function toLocalDateStr(d){ return d.toLocaleDateString('en-CA'); }
 
-function getDateRange(f) {
+function setDashPreset(f, btn) {
   const now = new Date();
-  let start;
-  if(f==='day') start = new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  else if(f==='week'){ const d=now.getDay()||7; start=new Date(now); start.setDate(now.getDate()-d+1); start.setHours(0,0,0,0); }
-  else if(f==='month') start = new Date(now.getFullYear(),now.getMonth(),1);
-  else if(f==='quarter') start = new Date(now.getFullYear(),Math.floor(now.getMonth()/3)*3,1);
-  else start = new Date(now.getFullYear(),0,1);
-  return start.toISOString();
-}
-
-function setDashFilter(f, btn) {
-  dashFilter = f;
+  let from, to = toLocalDateStr(now);
+  if(f==='day'){ from = to; }
+  else if(f==='week'){ const d=now.getDay()||7; const s=new Date(now); s.setDate(now.getDate()-d+1); from=toLocalDateStr(s); }
+  else if(f==='month'){ from = toLocalDateStr(new Date(now.getFullYear(),now.getMonth(),1)); }
+  else if(f==='quarter'){ from = toLocalDateStr(new Date(now.getFullYear(),Math.floor(now.getMonth()/3)*3,1)); }
+  else if(f==='year'){ from = toLocalDateStr(new Date(now.getFullYear(),0,1)); }
+  else { from = '2020-01-01'; } // all
+  const fi = document.getElementById('dash-from');
+  const ti = document.getElementById('dash-to');
+  if(fi) fi.value = from;
+  if(ti) ti.value = to;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   loadDashboard();
 }
 
 async function loadDashboard() {
-  const from = getDateRange(dashFilter);
+  const fromVal = document.getElementById('dash-from')?.value;
+  const toVal   = document.getElementById('dash-to')?.value;
+  const now = new Date();
+  const from = fromVal ? fromVal+'T00:00:00+07:00' : new Date(now.getFullYear(),now.getMonth(),now.getDate()).toISOString();
+  const to   = toVal   ? toVal+'T23:59:59+07:00'   : new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59).toISOString();
   const [{data:revData},{data:expData}] = await Promise.all([
-    db.from('revenues').select('total_amount,order_id,order_status,selling_price,quantity,promotion_discount,products(original_price)').gte('created_at',from).is('deleted_at',null),
-    db.from('expenses').select('total_amount,item_name').gte('created_at',from)
+    db.from('revenues').select('total_amount,order_id,order_status,selling_price,quantity,promotion_discount,products(original_price)').gte('created_at',from).lte('created_at',to).or('is_deleted.is.null,is_deleted.eq.false'),
+    db.from('expenses').select('total_amount,item_name').gte('created_at',from).lte('created_at',to)
   ]);
   const validOrders = (revData||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công');
   const totalRev = validOrders.reduce((s,r)=>s+(r.total_amount||0),0);
@@ -1104,7 +1160,7 @@ async function loadDashboard() {
   </tbody></table>` : '<div class="empty-state"><div class="icon">◻</div><p>Không có chi phí</p></div>';
 
   // Revenue by type
-  const {data:revDetail} = await db.from('revenues').select('total_amount,quantity,products(type,original_price),order_status,selling_price,promotion_discount').gte('created_at',from).is('deleted_at',null);
+  const {data:revDetail} = await db.from('revenues').select('total_amount,quantity,products(type,original_price),order_status,selling_price,promotion_discount').gte('created_at',from).lte('created_at',to).or('is_deleted.is.null,is_deleted.eq.false');
   const typeMap = {};
   (revDetail||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công').forEach(r=>{
     const t=r.products?.type||'Khác';
@@ -1330,11 +1386,11 @@ function showAlert(id,msg,type='success'){
 async function loadOrders(){
   const statusFilter = document.getElementById('order-status-filter').value;
   const isDeletedView = statusFilter === '__deleted__';
-  let q = db.from('revenues').select('order_id,created_at,updated_at,updated_by,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,deleted_at,customers(customer_name),products(product_name,type)').order('created_at',{ascending:false}).limit(200);
+  let q = db.from('revenues').select('order_id,created_at,updated_at,updated_by,customer_phone,sku,quantity,selling_price,promotion_discount,total_amount,order_status,notes,is_deleted,customers(customer_name),products(product_name,type)').order('created_at',{ascending:false}).limit(200);
   if(isDeletedView){
-    q = q.not('deleted_at','is',null);
+    q = q.eq('is_deleted',true);
   } else {
-    q = q.is('deleted_at',null);
+    q = q.or('is_deleted.is.null,is_deleted.eq.false');
     if(statusFilter) q=q.eq('order_status',statusFilter);
   }
   const {data,error}=await q;
@@ -1403,7 +1459,7 @@ async function saveOrderStatus(){
 async function deleteOrder(id){
   if(!confirm(`Xóa đơn hàng ${id.toUpperCase()}?\n\nĐơn sẽ được chuyển vào thùng rác, có thể khôi phục sau.`)) return;
   const now=new Date().toISOString();
-  const {error}=await db.from('revenues').update({deleted_at:now,updated_at:now}).eq('order_id',id);
+  const {error}=await db.from('revenues').update({is_deleted:true,updated_at:now}).eq('order_id',id);
   if(error) return showToast('Lỗi: '+error.message,'error');
   showToast('🗑 Đã xóa đơn hàng','success');
   loadOrders();
@@ -1412,7 +1468,7 @@ async function deleteOrder(id){
 async function restoreOrder(id){
   if(!confirm(`Khôi phục đơn hàng ${id.toUpperCase()}?`)) return;
   const now=new Date().toISOString();
-  const {error}=await db.from('revenues').update({deleted_at:null,updated_at:now}).eq('order_id',id);
+  const {error}=await db.from('revenues').update({is_deleted:false,updated_at:now}).eq('order_id',id);
   if(error) return showToast('Lỗi: '+error.message,'error');
   showToast('✦ Đã khôi phục đơn hàng','success');
   loadOrders();
@@ -1646,6 +1702,28 @@ async function saveProduct(){
 // ============================================================
 let allCustomers=[];
 
+
+async function saveNewCustomer(){
+  const phone = document.getElementById('addcust-phone').value.trim();
+  const name  = document.getElementById('addcust-name').value.trim();
+  if(!phone) return showAlert('addcust-alert','Vui lòng nhập số điện thoại.','error');
+  if(!name)  return showAlert('addcust-alert','Vui lòng nhập họ tên.','error');
+  const {error} = await db.from('customers').insert({
+    phone,
+    customer_name: name,
+    address: document.getElementById('addcust-address').value.trim()||null,
+    rank:    document.getElementById('addcust-rank').value,
+    total_spent: 0
+  });
+  if(error){
+    if(error.code==='23505') return showAlert('addcust-alert','SĐT này đã tồn tại trong hệ thống.','error');
+    return showAlert('addcust-alert','Lỗi: '+error.message,'error');
+  }
+  closeModal('modal-addcustomer');
+  showToast('✦ Thêm khách hàng thành công','success');
+  ['addcust-phone','addcust-name','addcust-address'].forEach(id=>document.getElementById(id).value='');
+  loadCustomers();
+}
 async function loadCustomers(){
   const {data}=await db.from('customers').select('*').order('total_spent',{ascending:false});
   allCustomers=data||[]; allCustomersCache=data||[];
