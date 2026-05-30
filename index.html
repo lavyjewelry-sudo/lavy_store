@@ -1491,25 +1491,36 @@ async function saveEditProduct(){
 
 async function saveExpense(){
   const name=document.getElementById('exp-name').value.trim();
-  const sku=document.getElementById('exp-sku').value.trim().toUpperCase()||null;
+  const skuRaw=document.getElementById('exp-sku').value.trim().toUpperCase();
+  const sku=skuRaw||null;
   const qty=parseInt(document.getElementById('exp-qty').value)||0;
   const amount=parseFloat(document.getElementById('exp-amount').value)||0;
-  const details=document.getElementById('exp-details').value.trim();
+  const detailsRaw=document.getElementById('exp-details').value.trim();
+  const details=detailsRaw||null;
   if(!name) return showAlert('inv-alert','Vui lòng nhập tên khoản mục.','error');
   if(!amount) return showAlert('inv-alert','Vui lòng nhập số tiền chi.','error');
-  await db.from('expenses').insert({item_name:name,sku,quantity:qty,total_amount:amount,details});
-  if(sku&&qty>0){
-    const {data:prod}=await db.from('products').select('stock_quantity').eq('sku',sku).single();
-    if(prod) await db.from('products').update({stock_quantity:(prod.stock_quantity||0)+qty,last_import_at:new Date().toISOString()}).eq('sku',sku);
+  try {
+    const {data:inserted, error:insErr}=await db.from('expenses').insert({
+      item_name:name, sku, quantity:qty, total_amount:amount, details
+    }).select();
+    if(insErr){ showAlert('inv-alert','Lỗi lưu chi phí: '+insErr.message,'error'); console.error('saveExpense insert error:',insErr); return; }
+    if(sku&&qty>0){
+      const {data:prod}=await db.from('products').select('stock_quantity').eq('sku',sku).single();
+      if(prod) await db.from('products').update({stock_quantity:(prod.stock_quantity||0)+qty,last_import_at:new Date().toISOString()}).eq('sku',sku);
+    }
+    ['exp-name','exp-sku','exp-amount','exp-details'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('exp-qty').value=1;
+    showToast('✦ Ghi nhận chi phí thành công','success');
+    await Promise.all([loadProducts(), loadExpenseLog(), loadExpenseInline()]);
+  } catch(e){
+    showAlert('inv-alert','Lỗi không xác định: '+e.message,'error');
+    console.error('saveExpense error:',e);
   }
-  ['exp-name','exp-sku','exp-amount','exp-details'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('exp-qty').value=1;
-  showToast('✦ Ghi nhận chi phí thành công','success');
-  loadProducts(); loadExpenseLog(); loadExpenseInline();
 }
 
 function renderExpenseTable(data, wrapId){
   const wrap=document.getElementById(wrapId);
+  if(!wrap) return; // tab chưa active, bỏ qua
   if(!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◻</div><p>Chưa có chi phí nào</p></div>'; return; }
   const total=data.reduce((s,e)=>s+(e.total_amount||0),0);
   wrap.innerHTML=`<div style="overflow-x:auto"><table><thead><tr>
@@ -1533,7 +1544,8 @@ async function loadExpenseLog(){
   let q=db.from('expenses').select('*').order('created_at',{ascending:false}).limit(500);
   if(from) q=q.gte('created_at',from+'T00:00:00');
   if(to) q=q.lte('created_at',to+'T23:59:59');
-  const {data}=await q;
+  const {data, error}=await q;
+  if(error){ console.error('loadExpenseLog error:',error); return; }
   renderExpenseTable(data,'explog-table-wrap');
 }
 
@@ -1543,7 +1555,8 @@ async function loadExpenseInline(){
   let q=db.from('expenses').select('*').order('created_at',{ascending:false}).limit(200);
   if(from) q=q.gte('created_at',from+'T00:00:00');
   if(to) q=q.lte('created_at',to+'T23:59:59');
-  const {data}=await q;
+  const {data, error}=await q;
+  if(error){ console.error('loadExpenseInline error:',error); return; }
   renderExpenseTable(data,'exp-inline-table-wrap');
 }
 
