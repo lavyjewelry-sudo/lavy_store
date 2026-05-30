@@ -1503,6 +1503,7 @@ async function saveExpense(){
     const {data:inserted, error:insErr}=await db.from('expenses').insert({
       item_name:name, sku, quantity:qty, total_amount:amount, details
     }).select();
+    console.log('[saveExpense] inserted:', inserted, 'error:', insErr);
     if(insErr){ showAlert('inv-alert','Lỗi lưu chi phí: '+insErr.message,'error'); console.error('saveExpense insert error:',insErr); return; }
     if(sku&&qty>0){
       const {data:prod}=await db.from('products').select('stock_quantity').eq('sku',sku).single();
@@ -1556,8 +1557,9 @@ async function loadExpenseInline(){
   if(from) q=q.gte('created_at',from+'T00:00:00');
   if(to) q=q.lte('created_at',to+'T23:59:59');
   const {data, error}=await q;
-  if(error){ console.error('loadExpenseInline error:',error); return; }
-  renderExpenseTable(data,'exp-inline-table-wrap');
+  console.log('[loadExpenseInline] data:', data, 'error:', error);
+  if(error){ console.error('loadExpenseInline error:',error); renderExpenseTable([],'exp-inline-table-wrap'); return; }
+  renderExpenseTable(data||[],'exp-inline-table-wrap');
 }
 
 function clearExpFilter(){
