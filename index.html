@@ -722,30 +722,74 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 
 <!-- Add Staff Modal -->
 <div class="modal-overlay" id="modal-addstaff">
-  <div class="modal" style="max-width:440px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div class="modal" style="max-width:500px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 class="modal-title" style="margin:0">Thêm Nhân Viên</h3>
       <button class="btn-icon" onclick="closeModal('modal-addstaff')">✕</button>
     </div>
-    <div class="two-col">
-      <div class="form-group"><label>Họ Tên *</label><input type="text" id="staff-name" placeholder="Nguyễn Thị Mai"/></div>
-      <div class="form-group"><label>Mã NV</label><input type="text" id="staff-code" placeholder="NV001"/></div>
+    <!-- Tabs -->
+    <div class="tab-bar" style="margin-bottom:16px">
+      <button class="tab-btn active" onclick="switchStaffTab('add','info',this)">👤 Thông Tin</button>
+      <button class="tab-btn" onclick="switchStaffTab('add','account',this)">🔑 Tài Khoản</button>
+      <button class="tab-btn" onclick="switchStaffTab('add','salary',this)">💰 Lương & Thưởng</button>
     </div>
-    <div class="two-col">
-      <div class="form-group"><label>Chức Vụ</label><input type="text" id="staff-role-name" placeholder="Nhân viên bán hàng"/></div>
-      <div class="form-group"><label>Phân Quyền</label>
-        <select id="staff-permission">
-          <option value="staff">Nhân Viên</option>
-          <option value="admin">Quản Lý</option>
+    <!-- Tab: Thông Tin -->
+    <div id="add-tab-info" class="tab-panel active">
+      <div class="two-col">
+        <div class="form-group"><label>Họ Tên *</label><input type="text" id="staff-name" placeholder="Nguyễn Thị Mai"/></div>
+        <div class="form-group"><label>Mã NV</label><input type="text" id="staff-code" placeholder="NV001"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label>Chức Vụ</label><input type="text" id="staff-role-name" placeholder="Nhân viên bán hàng"/></div>
+        <div class="form-group"><label>Phân Quyền</label>
+          <select id="staff-permission">
+            <option value="staff">Nhân Viên</option>
+            <option value="admin">Quản Lý</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label>SĐT</label><input type="text" id="staff-phone" placeholder="0912 345 678"/></div>
+        <div class="form-group"><label>Ngày Vào</label><input type="date" id="staff-joindate"/></div>
+      </div>
+      <div class="form-group"><label>Ghi Chú</label><textarea id="staff-notes" rows="2" placeholder="Lịch làm, lưu ý..."></textarea></div>
+    </div>
+    <!-- Tab: Tài Khoản -->
+    <div id="add-tab-account" class="tab-panel">
+      <div class="two-col">
+        <div class="form-group"><label>Tên Đăng Nhập</label><input type="text" id="staff-username" placeholder="nguyentmai"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="staff-email" placeholder="mai@lavyjewelry.com"/></div>
+      </div>
+      <div class="form-group"><label>Trạng Thái Tài Khoản</label>
+        <select id="staff-acc-status">
+          <option value="active">✅ Active — Đang hoạt động</option>
+          <option value="inactive">⛔ Inactive — Tạm khóa</option>
         </select>
       </div>
+      <div style="background:var(--cream);border:1px solid var(--stone-light);border-radius:10px;padding:12px;font-size:0.78rem;color:#9A9590;line-height:1.7">
+        ℹ️ Tài khoản này dùng để đăng nhập vào hệ thống. Mật khẩu sẽ do Admin cài đặt riêng trong Supabase Auth.
+      </div>
     </div>
-    <div class="two-col">
-      <div class="form-group"><label>SĐT</label><input type="text" id="staff-phone" placeholder="0912 345 678"/></div>
-      <div class="form-group"><label>Ngày Vào</label><input type="date" id="staff-joindate"/></div>
+    <!-- Tab: Lương & Thưởng -->
+    <div id="add-tab-salary" class="tab-panel">
+      <div class="two-col">
+        <div class="form-group"><label>Lương Cứng (VNĐ/tháng)</label><input type="number" id="staff-base-salary" placeholder="0" min="0"/></div>
+        <div class="form-group"><label>Thưởng (VNĐ)</label><input type="number" id="staff-bonus" placeholder="0" min="0"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label>Hoa Hồng (%)</label><input type="number" id="staff-commission" placeholder="0" min="0" max="100" step="0.1"/></div>
+        <div class="form-group"><label>Hình Thức Thanh Toán</label>
+          <select id="staff-pay-type">
+            <option value="">Chưa xác định</option>
+            <option value="Tiền mặt">Tiền mặt</option>
+            <option value="Chuyển khoản">Chuyển khoản</option>
+            <option value="Tiền mặt + Chuyển khoản">Tiền mặt + Chuyển khoản</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Ghi Chú Lương</label><textarea id="staff-salary-notes" rows="2" placeholder="Phụ cấp, điều kiện thưởng..."></textarea></div>
     </div>
-    <div class="form-group"><label>Ghi Chú</label><textarea id="staff-notes" rows="2" placeholder="Lịch làm, lưu ý..."></textarea></div>
-    <div style="display:flex;gap:10px">
+    <div style="display:flex;gap:10px;margin-top:16px">
       <button class="btn-primary" style="flex:1" onclick="saveStaff()">Thêm Nhân Viên</button>
       <button class="btn-ghost" style="flex:1" onclick="closeModal('modal-addstaff')">Huỷ</button>
     </div>
@@ -754,29 +798,72 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 
 <!-- Edit Staff Modal -->
 <div class="modal-overlay" id="modal-editstaff">
-  <div class="modal" style="max-width:440px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div class="modal" style="max-width:500px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h3 class="modal-title" style="margin:0">Chỉnh Sửa Nhân Viên</h3>
       <button class="btn-icon" onclick="closeModal('modal-editstaff')">✕</button>
     </div>
     <input type="hidden" id="edit-staff-id"/>
-    <div class="two-col">
-      <div class="form-group"><label>Họ Tên *</label><input type="text" id="edit-staff-name"/></div>
-      <div class="form-group"><label>Mã NV</label><input type="text" id="edit-staff-code"/></div>
+    <!-- Tabs -->
+    <div class="tab-bar" style="margin-bottom:16px">
+      <button class="tab-btn active" onclick="switchStaffTab('edit','info',this)">👤 Thông Tin</button>
+      <button class="tab-btn" onclick="switchStaffTab('edit','account',this)">🔑 Tài Khoản</button>
+      <button class="tab-btn" onclick="switchStaffTab('edit','salary',this)">💰 Lương & Thưởng</button>
     </div>
-    <div class="two-col">
-      <div class="form-group"><label>Chức Vụ</label><input type="text" id="edit-staff-role-name"/></div>
-      <div class="form-group"><label>Phân Quyền</label>
-        <select id="edit-staff-permission"><option value="staff">Nhân Viên</option><option value="admin">Quản Lý</option></select>
+    <!-- Tab: Thông Tin -->
+    <div id="edit-tab-info" class="tab-panel active">
+      <div class="two-col">
+        <div class="form-group"><label>Họ Tên *</label><input type="text" id="edit-staff-name"/></div>
+        <div class="form-group"><label>Mã NV</label><input type="text" id="edit-staff-code"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label>Chức Vụ</label><input type="text" id="edit-staff-role-name"/></div>
+        <div class="form-group"><label>Phân Quyền</label>
+          <select id="edit-staff-permission"><option value="staff">Nhân Viên</option><option value="admin">Quản Lý</option></select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label>SĐT</label><input type="text" id="edit-staff-phone"/></div>
+        <div class="form-group"><label>Trạng Thái</label>
+          <select id="edit-staff-status"><option>Đang làm việc</option><option>Nghỉ phép</option><option>Đã nghỉ việc</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Ghi Chú</label><textarea id="edit-staff-notes" rows="2"></textarea></div>
+    </div>
+    <!-- Tab: Tài Khoản -->
+    <div id="edit-tab-account" class="tab-panel">
+      <div class="two-col">
+        <div class="form-group"><label>Tên Đăng Nhập</label><input type="text" id="edit-staff-username" placeholder="nguyentmai"/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="edit-staff-email" placeholder="mai@lavyjewelry.com"/></div>
+      </div>
+      <div class="form-group"><label>Trạng Thái Tài Khoản</label>
+        <select id="edit-staff-acc-status">
+          <option value="active">✅ Active — Đang hoạt động</option>
+          <option value="inactive">⛔ Inactive — Tạm khóa</option>
+        </select>
       </div>
     </div>
-    <div class="two-col">
-      <div class="form-group"><label>SĐT</label><input type="text" id="edit-staff-phone"/></div>
-      <div class="form-group"><label>Trạng Thái</label><select id="edit-staff-status"><option>Đang làm việc</option><option>Nghỉ phép</option><option>Đã nghỉ việc</option></select></div>
+    <!-- Tab: Lương & Thưởng -->
+    <div id="edit-tab-salary" class="tab-panel">
+      <div class="two-col">
+        <div class="form-group"><label>Lương Cứng (VNĐ/tháng)</label><input type="number" id="edit-staff-base-salary" placeholder="0" min="0"/></div>
+        <div class="form-group"><label>Thưởng (VNĐ)</label><input type="number" id="edit-staff-bonus" placeholder="0" min="0"/></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label>Hoa Hồng (%)</label><input type="number" id="edit-staff-commission" placeholder="0" min="0" max="100" step="0.1"/></div>
+        <div class="form-group"><label>Hình Thức Thanh Toán</label>
+          <select id="edit-staff-pay-type">
+            <option value="">Chưa xác định</option>
+            <option value="Tiền mặt">Tiền mặt</option>
+            <option value="Chuyển khoản">Chuyển khoản</option>
+            <option value="Tiền mặt + Chuyển khoản">Tiền mặt + Chuyển khoản</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Ghi Chú Lương</label><textarea id="edit-staff-salary-notes" rows="2" placeholder="Phụ cấp, điều kiện thưởng..."></textarea></div>
     </div>
-    <div class="form-group"><label>Ghi Chú</label><textarea id="edit-staff-notes" rows="2"></textarea></div>
-    <div style="display:flex;gap:10px">
-      <button class="btn-primary" style="flex:1" onclick="saveEditStaff()">Lưu</button>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="btn-primary" style="flex:1" onclick="saveEditStaff()">Lưu Thay Đổi</button>
       <button class="btn-ghost" style="flex:1" onclick="closeModal('modal-editstaff')">Huỷ</button>
     </div>
   </div>
@@ -976,13 +1063,21 @@ function setDashFilter(f, btn) {
 async function loadDashboard() {
   const from = getDateRange(dashFilter);
   const [{data:revData},{data:expData}] = await Promise.all([
-    db.from('revenues').select('total_amount,order_id,order_status').gte('created_at',from).is('deleted_at',null),
+    db.from('revenues').select('total_amount,order_id,order_status,selling_price,quantity,promotion_discount,products(original_price)').gte('created_at',from).is('deleted_at',null),
     db.from('expenses').select('total_amount,item_name').gte('created_at',from)
   ]);
-  const totalRev = (revData||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công').reduce((s,r)=>s+(r.total_amount||0),0);
+  const validOrders = (revData||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công');
+  const totalRev = validOrders.reduce((s,r)=>s+(r.total_amount||0),0);
   const totalExp = (expData||[]).reduce((s,e)=>s+(e.total_amount||0),0);
-  const profit = totalRev-totalExp;
-  const orderCnt = (revData||[]).length;
+  // Lợi nhuận gộp = Σ(giá bán thực tế - giá vốn) × số lượng
+  const profit = validOrders.reduce((s,r)=>{
+    const costPrice = r.products?.original_price || 0;
+    const qty = r.quantity || 1;
+    const disc = r.promotion_discount || 0;
+    const actualSell = ((r.selling_price||0) * qty - disc) / qty; // giá bán thực mỗi cái
+    return s + (actualSell - costPrice) * qty;
+  }, 0);
+  const orderCnt = validOrders.length;
   document.getElementById('kpi-revenue').textContent = fmt(totalRev);
   document.getElementById('kpi-expenses').textContent = fmt(totalExp);
   document.getElementById('kpi-profit').textContent = fmt(profit);
@@ -1004,7 +1099,7 @@ async function loadDashboard() {
   </tbody></table>` : '<div class="empty-state"><div class="icon">◻</div><p>Không có chi phí</p></div>';
 
   // Revenue by type
-  const {data:revDetail} = await db.from('revenues').select('total_amount,quantity,products(type),order_status').gte('created_at',from).is('deleted_at',null);
+  const {data:revDetail} = await db.from('revenues').select('total_amount,quantity,products(type,original_price),order_status,selling_price,promotion_discount').gte('created_at',from).is('deleted_at',null);
   const typeMap = {};
   (revDetail||[]).filter(r=>r.order_status!=='Đã huỷ'&&r.order_status!=='Không thành công').forEach(r=>{
     const t=r.products?.type||'Khác';
@@ -1324,7 +1419,7 @@ async function restoreOrder(id){
 let allProducts=[];
 
 async function loadProducts(){
-  const {data}=await db.from('products').select('*').order('sku');
+  const {data}=await db.from('products').select('*').order('last_import_at',{ascending:false,nullsFirst:false}).order('sku');
   allProducts=data||[]; allProductsCache=data||[];
   filterProducts();
 }
@@ -1342,7 +1437,7 @@ function renderProducts(prods){
   wrap.innerHTML=`<div style="overflow-x:auto"><table><thead><tr>
     <th>SKU</th><th>Tên Sản Phẩm</th><th>Loại</th>
     ${showCost?'<th>Giá Vốn</th>':''}
-    <th>Giá Bán</th><th>Tồn Kho</th><th>Ghi Chú</th><th></th>
+    <th>Giá Bán</th><th>Tồn Kho</th><th>Ngày Nhập GN</th><th>Ghi Chú</th><th></th>
   </tr></thead><tbody>
   ${prods.map(p=>{
     const stock=p.stock_quantity||0;
@@ -1354,6 +1449,7 @@ function renderProducts(prods){
       ${showCost?`<td>${fmt(p.original_price)}</td>`:''}
       <td style="color:#5A7A52;font-weight:500">${fmt(p.selling_price)}</td>
       <td><span class="stock-badge ${cls}">${fmtNum(stock)}</span></td>
+      <td style="font-size:0.74rem;color:#9A9590;white-space:nowrap">${p.last_import_at?fmtDate(p.last_import_at):'—'}</td>
       <td style="font-size:0.75rem;color:#9A9590;max-width:140px">${p.notes||'—'}</td>
       <td>${isAdmin()?`<button class="btn-icon" onclick="openEditProduct('${p.sku}')" title="Chỉnh sửa">✎</button>`:''}
       </td>
@@ -1404,7 +1500,7 @@ async function saveExpense(){
   await db.from('expenses').insert({item_name:name,sku,quantity:qty,total_amount:amount,details});
   if(sku&&qty>0){
     const {data:prod}=await db.from('products').select('stock_quantity').eq('sku',sku).single();
-    if(prod) await db.from('products').update({stock_quantity:(prod.stock_quantity||0)+qty}).eq('sku',sku);
+    if(prod) await db.from('products').update({stock_quantity:(prod.stock_quantity||0)+qty,last_import_at:new Date().toISOString()}).eq('sku',sku);
   }
   ['exp-name','exp-sku','exp-amount','exp-details'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('exp-qty').value=1;
@@ -1624,14 +1720,18 @@ async function loadStaff(){
   const {data}=await db.from('staff').select('*').order('created_at',{ascending:false});
   const wrap=document.getElementById('staff-list-wrap');
   if(!data||!data.length){ wrap.innerHTML='<div class="empty-state"><div class="icon">◐</div><p>Chưa có nhân viên nào</p></div>'; return; }
-  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+  wrap.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
   ${data.map(s=>`<div class="hr-card">
     <div class="hr-avatar">${(s.staff_name?.[0]||'?').toUpperCase()}</div>
     <div style="flex:1">
       <div style="font-weight:600;color:var(--charcoal);font-size:0.88rem">${s.staff_name}</div>
       <div style="font-size:0.74rem;color:#9A9590;margin-top:2px">${s.role_name||'—'} · <span class="badge ${s.permission==='admin'?'badge-gold':'badge-sage'}" style="font-size:0.65rem">${s.permission==='admin'?'Admin':'Nhân Viên'}</span></div>
       <div style="font-size:0.73rem;color:#B0A898;margin-top:3px">${s.phone||''} · Vào: ${fmtDateOnly(s.join_date)}</div>
-      <div style="font-size:0.72rem;color:${s.status==='Đang làm việc'?'#5A7A52':'#9A9590'};margin-top:2px">● ${s.status||'—'}</div>
+      ${s.username?`<div style="font-size:0.72rem;color:#9A9590;margin-top:2px">👤 @${s.username} · <span style="color:${s.acc_status==='active'?'#5A7A52':'var(--error)'}">${s.acc_status==='active'?'Active':'Inactive'}</span></div>`:''}
+      <div style="display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap">
+        <span style="font-size:0.72rem;color:${s.status==='Đang làm việc'?'#5A7A52':'#9A9590'}">● ${s.status||'—'}</span>
+        ${s.base_salary?`<span style="font-size:0.7rem;color:var(--gold);font-weight:500">💰 ${fmt(s.base_salary)}/tháng</span>`:''}
+      </div>
     </div>
     <button class="btn-icon" onclick="openEditStaff('${s.id}')" title="Chỉnh sửa">✎</button>
   </div>`).join('')}
@@ -1639,18 +1739,35 @@ async function loadStaff(){
   window._staffData=data;
 }
 
+function switchStaffTab(prefix, tab, btn){
+  const modalId = prefix==='add' ? 'modal-addstaff' : 'modal-editstaff';
+  const modal = document.getElementById(modalId);
+  modal.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  modal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(prefix+'-tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
 async function saveStaff(){
   const name=document.getElementById('staff-name').value.trim();
   if(!name) return showAlert('hr-alert','Vui lòng nhập họ tên.','error');
   const {error}=await db.from('staff').insert({
     staff_name:name,
-    staff_code:document.getElementById('staff-code').value.trim(),
-    role_name:document.getElementById('staff-role-name').value.trim(),
+    staff_code:document.getElementById('staff-code').value.trim()||null,
+    role_name:document.getElementById('staff-role-name').value.trim()||null,
     permission:document.getElementById('staff-permission').value,
-    phone:document.getElementById('staff-phone').value.trim(),
+    phone:document.getElementById('staff-phone').value.trim()||null,
     join_date:document.getElementById('staff-joindate').value||null,
-    notes:document.getElementById('staff-notes').value.trim(),
-    status:'Đang làm việc'
+    notes:document.getElementById('staff-notes').value.trim()||null,
+    status:'Đang làm việc',
+    username:document.getElementById('staff-username').value.trim()||null,
+    email:document.getElementById('staff-email').value.trim()||null,
+    acc_status:document.getElementById('staff-acc-status').value||'active',
+    base_salary:parseFloat(document.getElementById('staff-base-salary').value)||0,
+    bonus:parseFloat(document.getElementById('staff-bonus').value)||0,
+    commission:parseFloat(document.getElementById('staff-commission').value)||0,
+    pay_type:document.getElementById('staff-pay-type').value||null,
+    salary_notes:document.getElementById('staff-salary-notes').value.trim()||null,
   });
   if(error) return showAlert('hr-alert','Lỗi: '+error.message,'error');
   closeModal('modal-addstaff');
@@ -1661,6 +1778,13 @@ async function saveStaff(){
 function openEditStaff(id){
   const s=(window._staffData||[]).find(x=>x.id==id||x.id===id);
   if(!s) return;
+  // Reset to first tab
+  const modal=document.getElementById('modal-editstaff');
+  modal.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  modal.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('edit-tab-info').classList.add('active');
+  modal.querySelector('.tab-btn').classList.add('active');
+  // Thông tin
   document.getElementById('edit-staff-id').value=s.id;
   document.getElementById('edit-staff-name').value=s.staff_name||'';
   document.getElementById('edit-staff-code').value=s.staff_code||'';
@@ -1669,6 +1793,16 @@ function openEditStaff(id){
   document.getElementById('edit-staff-phone').value=s.phone||'';
   document.getElementById('edit-staff-status').value=s.status||'Đang làm việc';
   document.getElementById('edit-staff-notes').value=s.notes||'';
+  // Tài khoản
+  document.getElementById('edit-staff-username').value=s.username||'';
+  document.getElementById('edit-staff-email').value=s.email||'';
+  document.getElementById('edit-staff-acc-status').value=s.acc_status||'active';
+  // Lương
+  document.getElementById('edit-staff-base-salary').value=s.base_salary||0;
+  document.getElementById('edit-staff-bonus').value=s.bonus||0;
+  document.getElementById('edit-staff-commission').value=s.commission||0;
+  document.getElementById('edit-staff-pay-type').value=s.pay_type||'';
+  document.getElementById('edit-staff-salary-notes').value=s.salary_notes||'';
   openModal('modal-editstaff');
 }
 
@@ -1676,12 +1810,20 @@ async function saveEditStaff(){
   const id=document.getElementById('edit-staff-id').value;
   const {error}=await db.from('staff').update({
     staff_name:document.getElementById('edit-staff-name').value.trim(),
-    staff_code:document.getElementById('edit-staff-code').value.trim(),
-    role_name:document.getElementById('edit-staff-role-name').value.trim(),
+    staff_code:document.getElementById('edit-staff-code').value.trim()||null,
+    role_name:document.getElementById('edit-staff-role-name').value.trim()||null,
     permission:document.getElementById('edit-staff-permission').value,
-    phone:document.getElementById('edit-staff-phone').value.trim(),
+    phone:document.getElementById('edit-staff-phone').value.trim()||null,
     status:document.getElementById('edit-staff-status').value,
-    notes:document.getElementById('edit-staff-notes').value.trim(),
+    notes:document.getElementById('edit-staff-notes').value.trim()||null,
+    username:document.getElementById('edit-staff-username').value.trim()||null,
+    email:document.getElementById('edit-staff-email').value.trim()||null,
+    acc_status:document.getElementById('edit-staff-acc-status').value||'active',
+    base_salary:parseFloat(document.getElementById('edit-staff-base-salary').value)||0,
+    bonus:parseFloat(document.getElementById('edit-staff-bonus').value)||0,
+    commission:parseFloat(document.getElementById('edit-staff-commission').value)||0,
+    pay_type:document.getElementById('edit-staff-pay-type').value||null,
+    salary_notes:document.getElementById('edit-staff-salary-notes').value.trim()||null,
   }).eq('id',id);
   if(error) return showToast('Lỗi: '+error.message,'error');
   closeModal('modal-editstaff');
