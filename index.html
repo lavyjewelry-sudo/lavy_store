@@ -14,6 +14,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script>
+// Mobile UI functions — loaded BEFORE any CDN to avoid ReferenceError
+function toggleDrawer(){
+  var sidebar=document.querySelector('.sidebar');
+  var overlay=document.getElementById('sidebar-overlay');
+  if(!sidebar||!overlay) return;
+  if(sidebar.classList.contains('drawer-open')){ closeDrawer(); }
+  else { sidebar.classList.add('drawer-open'); overlay.classList.add('open'); document.body.style.overflow='hidden'; }
+}
+function closeDrawer(){
+  var sidebar=document.querySelector('.sidebar');
+  var overlay=document.getElementById('sidebar-overlay');
+  if(sidebar) sidebar.classList.remove('drawer-open');
+  if(overlay) overlay.classList.remove('open');
+  document.body.style.overflow='';
+}
+function setBottomNav(name){
+  document.querySelectorAll('.bottom-nav-item').forEach(function(b){ b.classList.remove('active'); });
+  var el=document.getElementById('bnav-'+name);
+  if(el) el.classList.add('active');
+  var titles={dashboard:'Dashboard',pos:'Bán Hàng',orders:'Đơn Hàng',inventory:'Kho & Nhập Hàng',customers:'Khách Hàng',hr:'Nhân Sự',import:'Import Dữ Liệu'};
+  var t=document.getElementById('mobile-topbar-title');
+  if(t) t.textContent=titles[name]||'Lavy Boutique';
+  closeDrawer();
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--cream:#F7F5F0;--cream-deep:#EDE9E1;--gold:#B89766;--gold-pale:#EDE0CC;--charcoal:#2D2D2D;--charcoal-soft:#4A4A4A;--pearl:#FFFFFF;--sage:#E2E8DD;--sage-dark:#C8D4C2;--stone:#D6D0C8;--stone-light:#EAE6DF;--error:#C0574B;--error-pale:#F9EDEB;}
@@ -1157,6 +1183,8 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 <div class="toast" id="toast"></div>
 
 <script>
+
+
 // ============================================================
 //  SUPABASE CONFIG
 // ============================================================
@@ -2307,16 +2335,16 @@ document.getElementById('pos-status').addEventListener('change', calcTotal);
 
 <!-- =================== BOTTOM NAV (mobile) =================== -->
 <nav class="bottom-nav" id="bottom-nav">
-  <button class="bottom-nav-item admin-only" id="bnav-dashboard" onclick="showScreen('dashboard',null);setBottomNav('dashboard')" title="Dashboard">
+  <button class="bottom-nav-item admin-only" id="bnav-dashboard" onclick="showScreen('dashboard',null)" title="Dashboard">
     <span class="bn-icon">◈</span><span>Dashboard</span>
   </button>
-  <button class="bottom-nav-item" id="bnav-pos" onclick="showScreen('pos',null);setBottomNav('pos')" title="Bán Hàng">
+  <button class="bottom-nav-item" id="bnav-pos" onclick="showScreen('pos',null)" title="Bán Hàng">
     <span class="bn-icon">◉</span><span>Bán Hàng</span>
   </button>
-  <button class="bottom-nav-item" id="bnav-orders" onclick="showScreen('orders',null);setBottomNav('orders')" title="Đơn Hàng">
+  <button class="bottom-nav-item" id="bnav-orders" onclick="showScreen('orders',null)" title="Đơn Hàng">
     <span class="bn-icon">◷</span><span>Đơn Hàng</span>
   </button>
-  <button class="bottom-nav-item" id="bnav-customers" onclick="showScreen('customers',null);setBottomNav('customers')" title="Khách Hàng">
+  <button class="bottom-nav-item" id="bnav-customers" onclick="showScreen('customers',null)" title="Khách Hàng">
     <span class="bn-icon">◎</span><span>Khách Hàng</span>
   </button>
   <button class="bottom-nav-item" id="bnav-more" onclick="toggleDrawer()" title="Thêm">
