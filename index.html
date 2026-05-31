@@ -2,8 +2,14 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Lavy"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#B89766"/>
 <title>Lavy Boutique — CRM & POS</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23B89766'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia,serif' font-size='36' font-weight='700' fill='white' letter-spacing='-1'%3EL%3C/text%3E%3C/svg%3E"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -18,7 +24,12 @@ input,input[type="text"],input[type="tel"],input[type="number"],input[type="emai
 h1,h2,h3,h4{font-family:'Playfair Display',serif;}
 /* SIDEBAR */
 .sidebar{width:240px;min-width:240px;background:var(--pearl);border-right:1px solid var(--stone-light);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;box-shadow:2px 0 20px rgba(0,0,0,0.04);}
-.sidebar-logo{padding:24px 24px 20px;border-bottom:1px solid var(--stone-light);}
+.sidebar-logo{padding:20px 22px 18px;border-bottom:1px solid var(--stone-light);}
+.lavy-logo-mark{margin-bottom:10px;}
+.lavy-logo-text{display:flex;flex-direction:column;}
+.lavy-name{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--charcoal);letter-spacing:0.06em;line-height:1;}
+.lavy-boutique{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:400;color:var(--charcoal);letter-spacing:0.06em;}
+.lavy-logo-text p{font-size:0.6rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.24em;margin-top:4px;font-weight:700;}
 .sidebar-logo h1{font-size:1.4rem;font-weight:600;color:var(--charcoal);letter-spacing:0.04em;}
 .sidebar-logo p{font-size:0.62rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.22em;margin-top:2px;font-weight:700;}
 .role-badge{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:10px;font-size:0.65rem;font-weight:600;letter-spacing:0.08em;background:var(--gold-pale);color:var(--gold);}
@@ -197,16 +208,228 @@ input[readonly]{background:var(--cream)!important;color:#9A9590!important;cursor
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--stone);border-radius:4px;}
+
+/* ════════════════════════════════════════════
+   MOBILE — bottom nav + responsive layout
+   ════════════════════════════════════════════ */
+:root { --bottom-nav-h: 60px; }
+
+/* ─── Bottom Navigation Bar ─── */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: var(--bottom-nav-h);
+  background: var(--pearl);
+  border-top: 1px solid var(--stone-light);
+  z-index: 100;
+  align-items: stretch;
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.07);
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  color: #9A9590;
+  font-size: 0.6rem;
+  font-weight: 500;
+  padding: 0;
+  transition: color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-item .bn-icon { font-size: 1.15rem; line-height: 1; }
+.bottom-nav-item.active { color: var(--gold); }
+.bottom-nav-item.hidden-nav { display: none; }
+
+/* ─── Mobile hamburger / top bar ─── */
+.mobile-topbar {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 54px;
+  background: var(--pearl);
+  border-bottom: 1px solid var(--stone-light);
+  z-index: 101;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.mobile-topbar-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 600; flex: 1; color: var(--charcoal); }
+.hamburger-btn { background: none; border: none; cursor: pointer; font-size: 1.25rem; color: var(--charcoal-soft); padding: 6px; -webkit-tap-highlight-color: transparent; }
+
+/* ─── Mobile Drawer Sidebar ─── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 150;
+}
+.sidebar-overlay.open { display: block; }
+.sidebar.drawer-open { transform: translateX(0) !important; }
+
+@media (max-width: 768px) {
+  /* Hide desktop sidebar, show mobile UI */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    z-index: 160;
+    top: 0;
+  }
+  .mobile-topbar { display: flex; }
+  .bottom-nav { display: flex; }
+
+  /* Main content padding adjustments */
+  .main-content {
+    margin-left: 0 !important;
+    max-width: 100vw !important;
+    padding: 12px 14px 80px !important;
+    padding-top: calc(54px + 12px) !important;
+  }
+
+  /* Page header stacks */
+  .page-header {
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .page-header-left h2 { font-size: 1.3rem; }
+  .page-header > div:last-child { width: 100%; }
+  .page-header > div:last-child input[type="text"],
+  .page-header > div:last-child input[type="search"] { width: 100% !important; }
+
+  /* KPI grid: 2x2 on mobile */
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi-card { padding: 14px 12px; }
+  .kpi-value { font-size: 1.15rem; }
+
+  /* Two-col → single col */
+  .two-col, .three-col, .grid-2-3, .grid-1-2 {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+
+  /* POS grid stacks vertically */
+  .pos-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
+  }
+
+  /* Tables: horizontal scroll container */
+  .card > div[style*="overflow-x:auto"],
+  div[style*="overflow-x:auto"] {
+    -webkit-overflow-scrolling: touch;
+  }
+  table { font-size: 0.76rem; }
+  th { font-size: 0.58rem; padding: 0 8px 8px; }
+  td { padding: 9px 8px; }
+
+  /* Modal full-screen on mobile */
+  .modal-overlay { align-items: flex-end !important; padding: 0 !important; }
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+    padding: 20px 18px 32px !important;
+  }
+
+  /* Tabs: scrollable */
+  .tab-bar {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-btn { padding: 9px 14px; font-size: 0.76rem; flex-shrink: 0; }
+
+  /* Filter bar wraps */
+  .filter-bar { gap: 6px; }
+  .filter-btn { padding: 5px 11px; font-size: 0.72rem; }
+
+  /* Dashboard date filter stacks */
+  #screen-dashboard .page-header > div:last-child {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #screen-dashboard .page-header > div:last-child > div:first-child {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* HR cards: full width */
+  .hr-card { padding: 14px; gap: 10px; }
+
+  /* Toast: bottom of screen above nav */
+  .toast { bottom: calc(var(--bottom-nav-h) + 12px) !important; right: 12px !important; left: 12px !important; max-width: unset !important; }
+
+  /* Autocomplete z-index fix */
+  .autocomplete-list { z-index: 300; }
+
+  /* Hide table columns that overflow on small screens - orders */
+  .orders-hide-mobile { display: none !important; }
+
+  /* Card padding */
+  .card { padding: 16px 14px; }
+
+  /* Buttons full width in forms */
+  .modal .btn-primary,
+  .modal .btn-ghost { padding: 12px 16px; font-size: 0.85rem; }
+}
+
+@media (max-width: 400px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .kpi-value { font-size: 1rem; }
+  .main-content { padding: 10px 10px 80px !important; padding-top: calc(54px + 10px) !important; }
+}
+
+@media (max-width: 768px) {
+  .orders-show-mobile { display: block !important; }
+}
 </style>
 </head>
 <body>
 
+<!-- =================== MOBILE TOPBAR =================== -->
+<div class="mobile-topbar" id="mobile-topbar">
+  <button class="hamburger-btn" onclick="toggleDrawer()">☰</button>
+  <div style="display:flex;align-items:center;gap:8px;flex:1">
+    <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="10" fill="var(--gold)"/>
+      <text x="18" y="26" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white" letter-spacing="-0.5">L</text>
+    </svg>
+    <span class="mobile-topbar-title" id="mobile-topbar-title" style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:600">Lavy Boutique</span>
+  </div>
+  <button class="btn-icon" onclick="showRoleModal()" title="Đổi vai trò" style="font-size:1rem">⚙</button>
+</div>
+
+<!-- Drawer overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeDrawer()"></div>
+
 <!-- =================== SIDEBAR =================== -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <h1>Lavy Boutique</h1>
-    <p>Lavy Jewelry</p>
-    <div id="sidebar-role-badge" class="role-badge">Admin</div>
+    <div class="lavy-logo-mark">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="36" height="36" rx="10" fill="var(--gold)"/>
+        <text x="18" y="26" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="700" fill="white" letter-spacing="-0.5">L</text>
+      </svg>
+    </div>
+    <div class="lavy-logo-text">
+      <span class="lavy-name">Lavy</span><span class="lavy-boutique"> Boutique</span>
+      <p>Lavy Jewelry</p>
+    </div>
+    <div id="sidebar-role-badge" class="role-badge" style="margin-top:10px">Admin</div>
   </div>
   <nav class="nav-section" id="main-nav">
     <p class="nav-label">Tổng Quan</p>
@@ -995,6 +1218,9 @@ let currentRole = localStorage.getItem('atelier_role') || 'admin';
 
 function applyRole() {
   const isAdmin = currentRole === 'admin';
+  document.querySelectorAll('.bottom-nav-item.admin-only').forEach(el=>{
+    el.style.display = isAdmin ? 'flex' : 'none';
+  });
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = isAdmin ? '' : 'none';
   });
@@ -1026,6 +1252,7 @@ const isAdmin = () => currentRole === 'admin';
 let currentScreen = 'dashboard';
 
 function showScreen(name, el) {
+  setBottomNav(name);
   if(el) {
     document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     el.classList.add('active');
@@ -1428,14 +1655,14 @@ function renderOrdersTable(data, isDeletedView, wrap){
   </colgroup>
   <thead><tr>
     <th style="white-space:nowrap">Mã Đơn</th>
-    <th style="white-space:nowrap">Ngày Tạo</th>
+    <th style="white-space:nowrap" class="orders-hide-mobile">Ngày Tạo</th>
     <th>Khách Hàng</th>
     <th>Sản Phẩm</th>
-    <th style="text-align:center">SL</th>
+    <th style="text-align:center" class="orders-hide-mobile">SL</th>
     <th style="text-align:right">Thực Thu</th>
     <th>Trạng Thái</th>
-    <th style="white-space:nowrap">Cập Nhật</th>
-    <th>Ghi Chú</th>
+    <th style="white-space:nowrap" class="orders-hide-mobile">Cập Nhật</th>
+    <th class="orders-hide-mobile">Ghi Chú</th>
     <th></th>
   </tr></thead><tbody>
   ${data.map(r=>{
@@ -1455,8 +1682,9 @@ function renderOrdersTable(data, isDeletedView, wrap){
     return `<tr style="${deleted?'opacity:0.55;background:var(--cream)':''}">
       <td style="max-width:120px">
         <span style="font-size:0.74rem;color:var(--gold);font-weight:700;letter-spacing:0.02em;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(r.order_id||'').toUpperCase()}">${(r.order_id||'').toUpperCase()}</span>
+        <span class="orders-show-mobile" style="font-size:0.68rem;color:#9A9590;display:none">${fmtDate(r.created_at)}</span>
       </td>
-      <td style="font-size:0.75rem;color:#6A6560;white-space:nowrap">${fmtDate(r.created_at)}</td>
+      <td class="orders-hide-mobile" style="font-size:0.75rem;color:#6A6560;white-space:nowrap">${fmtDate(r.created_at)}</td>
       <td style="font-weight:500;font-size:0.82rem">${r.customers?.customer_name||r.customer_phone||'—'}</td>
       <td>
         <div style="display:flex;flex-direction:column;gap:2px">
@@ -1464,11 +1692,11 @@ function renderOrdersTable(data, isDeletedView, wrap){
           ${r.products?.type?`<span class="badge badge-stone" style="font-size:0.65rem;width:fit-content">${r.products.type}</span>`:''}
         </div>
       </td>
-      <td style="text-align:center;font-weight:600">${r.quantity}</td>
+      <td class="orders-hide-mobile" style="text-align:center;font-weight:600">${r.quantity}</td>
       <td style="text-align:right;font-weight:600;color:#5A7A52;white-space:nowrap">${fmt(r.total_amount)}</td>
       <td>${deleted?statusPill('Đã xóa'):statusPill(r.order_status)}</td>
-      <td>${lastUpdate}</td>
-      <td style="font-size:0.75rem;color:#9A9590;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px" title="${r.notes||''}">${r.notes||'—'}</td>
+      <td class="orders-hide-mobile">${lastUpdate}</td>
+      <td class="orders-hide-mobile" style="font-size:0.75rem;color:#9A9590;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px" title="${r.notes||''}">${r.notes||'—'}</td>
       <td>${actionBtns}</td>
     </tr>`;
   }).join('')}
@@ -2076,5 +2304,25 @@ document.getElementById('pos-status').addEventListener('change', calcTotal);
   loadDashboard();
 })();
 </script>
+
+<!-- =================== BOTTOM NAV (mobile) =================== -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-item admin-only" id="bnav-dashboard" onclick="showScreen('dashboard',null);setBottomNav('dashboard')" title="Dashboard">
+    <span class="bn-icon">◈</span><span>Dashboard</span>
+  </button>
+  <button class="bottom-nav-item" id="bnav-pos" onclick="showScreen('pos',null);setBottomNav('pos')" title="Bán Hàng">
+    <span class="bn-icon">◉</span><span>Bán Hàng</span>
+  </button>
+  <button class="bottom-nav-item" id="bnav-orders" onclick="showScreen('orders',null);setBottomNav('orders')" title="Đơn Hàng">
+    <span class="bn-icon">◷</span><span>Đơn Hàng</span>
+  </button>
+  <button class="bottom-nav-item" id="bnav-customers" onclick="showScreen('customers',null);setBottomNav('customers')" title="Khách Hàng">
+    <span class="bn-icon">◎</span><span>Khách Hàng</span>
+  </button>
+  <button class="bottom-nav-item" id="bnav-more" onclick="toggleDrawer()" title="Thêm">
+    <span class="bn-icon">⋯</span><span>Thêm</span>
+  </button>
+</nav>
+
 </body>
 </html>
